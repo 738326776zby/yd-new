@@ -1,0 +1,5 @@
+.evaluationFlow {
+    background: url(~@/app/components/evaluation/assets/flow.png) center center
+      no-repeat;
+    background-size: contain;
+  }

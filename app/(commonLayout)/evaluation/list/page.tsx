@@ -1,0 +1,240 @@
+'use client'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  RiAddLine,
+  RiMoreFill
+} from '@remixicon/react'
+import cn from '@/utils/classnames'
+import type { EvaluationItem } from '@/models/evaluation'
+import Input from '@/app/components/base/input'
+import s from '@/app/(commonLayout)/apps/style.module.css'
+import test from './test.json'
+import AppIcon from '@/app/components/base/app-icon'
+import { Button } from 'antd'
+import { QuestionCircleFilled, DashOutlined } from '@ant-design/icons';
+import EvaluationPrincipleModal from '@/app/components/evaluation/evaluation-principle';
+import NewEvaluationPrincipleModal from '@/app/components/evaluation/new-evaluation'
+import CustomPopover from '@/app/components/base/popover'
+import { AppTypeIcon } from '@/app/components/app/type-selector'
+import { useRouter } from 'next/navigation'
+const DefaultToolsList = () => {
+  const [chooseTarget, setChooseTarget] = useState<EvaluationItem | undefined>()
+  const [allList, setAllList] = useState<EvaluationItem[]>([])
+  const [keywords, setKeywords] = useState<string>('')
+  const [open, setOpen] = useState(false)
+  const [openNew, setOpenNew] = useState(false)
+  const router= useRouter()
+
+  const handleKeywordsChange = (value: string) => {
+    setKeywords(value)
+  }
+  const filterList = () => {
+    return allList?.filter((collection) => {
+      if (keywords) {
+        return collection.title.toLowerCase().includes(keywords.toLowerCase())
+      }
+      return true
+    })
+  }
+  const Operations = (props: any) => {
+    const { target } = props
+    const onMouseLeave = async () => {
+      props.onClose?.()
+    }
+    const onClickExport = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation()
+      props.onClick?.()
+      e.preventDefault()
+      // exportCheck()
+    }
+    const onClickDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation()
+      props.onClick?.()
+      e.preventDefault()
+      // setShowConfirmDelete(true)
+    }
+    return (
+      <div className="relative w-full py-1" onMouseLeave={onMouseLeave}>
+        <button className={s.actionItem} onClick={() => {
+          setChooseTarget(target)
+          setOpenNew(true)
+        }}>
+          <span className={s.actionName}>编辑</span>
+        </button>
+        <button className={s.actionItem} onClick={onClickExport}>
+          <span className={s.actionName}>下载</span>
+        </button>
+        <div
+          className={cn(s.actionItem, s.deleteActionItem, 'group')}
+          onClick={onClickDelete}
+        >
+          <span className={cn(s.actionName, 'group-hover:text-red-500')}>
+            删除
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  const getDefaultToolsList = async () => {
+    setAllList((test as EvaluationItem[]) || [])
+
+  }
+  useEffect(() => {
+    getDefaultToolsList()
+  }, [])
+
+  return (
+    <div className="flex h-full relative flex overflow-hidden bg-gray-100 shrink-0 h-0 grow">
+      <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow">
+        <div
+          className={cn(
+            'sticky top-0 flex justify-between items-center pt-4 px-12  leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2 mb-4',
+          )}
+        >
+          <div
+            className={
+              'mb-1 text-xl font-semibold items-center justify-between flex flex-1'
+            }
+          >
+            <span className={s.textGradient}>
+              评测方案管理
+            </span>
+            <div className="flex items-center gap-2">
+              <Input
+                showLeftIcon
+                showClearIcon
+                wrapperClassName="w-[200px]"
+                value={keywords}
+                onChange={(e) => handleKeywordsChange(e.target.value)}
+                onClear={() => handleKeywordsChange('')}
+                placeholder='搜索评测方案'
+              />
+              <Button type="link" icon={<QuestionCircleFilled />} onClick={() => {
+                setOpen(true)
+              }}>查看效果评测原理</Button>
+            </div>
+          </div>
+
+        </div>
+        <div
+          className={cn(
+            'relative grid content-start grid-cols-1 gap-4 px-12 pt-2 pb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0',
+          )}
+        >
+          <div className='flex flex-col col-span-1 bg-gray-200 border-[0.5px] border-black/5 rounded-xl min-h-[160px] transition-all duration-200 ease-in-out cursor-pointer hover:bg-gray-50 hover:shadow-lg' onClick={() => {
+            setOpenNew(true)
+
+          }} >
+            <div className='group grow rounded-t-xl hover:bg-white' >
+              <div className='shrink-0 flex items-center p-4 pb-3'>
+                <div className='w-10 h-10 flex items-center justify-center border border-gray-200 bg-gray-100 rounded-lg group-hover:border-primary-100 group-hover:bg-primary-50'>
+                  <RiAddLine className='w-4 h-4 text-gray-500 group-hover:text-primary-600' />
+                </div>
+                <div className='ml-3 text-sm font-semibold leading-5 text-gray-800 group-hover:text-primary-600'>新建评测方案</div>
+              </div>
+            </div>
+          </div>
+          {filterList().map((collection) => (
+            <div
+              onClick={(e) => {
+                e.preventDefault()
+               router.push(`/evaluation/manage`)
+              }}
+              onMouseEnter={() => {
+                setChooseTarget(collection)
+              }}
+              onMouseLeave={() => {
+                setChooseTarget(undefined)
+              }}
+              className='relative h-[160px] group col-span-1 bg-components-card-bg border-[1px] border-solid border-components-card-border rounded-xl shadow-sm inline-flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg flex'
+            >
+              <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
+                <div className='relative shrink-0'>
+                  <AppIcon
+                    size="large"
+                    iconType={collection?.icon_type}
+                    icon={collection?.icon}
+                    background={collection?.icon_background}
+                    imageUrl={collection.icon_url}
+                  />
+                  <AppTypeIcon type={collection.mode} wrapperClassName='absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-sm' className='w-3 h-3' />
+                </div>
+                <div className='grow w-0 py-[1px]'>
+                  <div className='flex items-center text-sm leading-5 font-semibold text-text-secondary'>
+                    <div className='truncate' title={collection.title}>{collection.title}</div>
+                  </div>
+                  <div className='flex items-center text-[10px] leading-[18px] text-text-tertiary font-medium'>
+                    发布于{collection.publishTime}
+                  </div>
+                </div>
+              </div>
+              <div className='title-wrapper h-[90px] px-[14px] text-xs leading-normal text-text-tertiary flex flex-col gap-1'>
+                <div
+                  className={cn('line-clamp-1')}
+                  title={collection.progress}
+                >
+                  来源：{collection.progress}
+                </div>
+                <div
+                  className={cn('line-clamp-1')}
+                  title={collection.progress}
+                >
+                  适用说明：{collection.progress}
+                </div>
+              </div>
+              <div className={cn(
+                'absolute bottom-1 left-0 right-0 items-center shrink-0 pt-1 pl-[14px] pr-[6px] pb-[6px] h-[42px]',
+              )}>
+                {
+                  chooseTarget?.id === collection.id && <>
+                    <div className={cn('grow flex items-center gap-1 w-0')} onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                    }}>
+                    </div>
+                    {/* <div className=' group-hover:!flex shrink-0 mx-1 w-[1px] h-[14px]' /> */}
+                    <div className='group-hover:!flex shrink-0 justify-end'>
+                      <CustomPopover
+                        htmlContent={<Operations target={collection} />}
+                        position="br"
+                        trigger="click"
+                        btnElement={
+                          <div
+                            className='flex items-center justify-center w-8 h-8 cursor-pointer rounded-md'
+                          >
+                            <RiMoreFill className='w-4 h-4 text-text-tertiary' />
+                          </div>
+                        }
+                        btnClassName={open =>
+                          cn(
+                            open ? '!bg-black/5 !shadow-none' : '!bg-transparent',
+                            'h-8 w-8 !p-2 rounded-md border-none hover:!bg-black/5',
+                          )
+                        }
+                        // popupClassName={
+                        //   (app.mode === 'completion' || app.mode === 'chat')
+                        //     ? '!w-[256px] translate-x-[-224px]'
+                        //     : '!w-[160px] translate-x-[-128px]'
+                        // }
+                        className={'h-fit !z-20'}
+                      />
+                    </div>
+                  </>
+                }
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <EvaluationPrincipleModal open={open} setOpen={() => {
+        setOpen(!open)
+      }} />
+      <NewEvaluationPrincipleModal open={openNew} setOpen={() => {
+        setOpenNew(!openNew)
+      }} target={chooseTarget} />
+    </div>
+  )
+}
+DefaultToolsList.displayName = 'List'
+export default DefaultToolsList

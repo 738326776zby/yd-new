@@ -1,0 +1,152 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 4844754 */
+  src: url('iconfont.woff2?t=1741226219366') format('woff2'),
+       url('iconfont.woff?t=1741226219366') format('woff'),
+       url('iconfont.ttf?t=1741226219366') format('truetype'),
+       url('iconfont.svg?t=1741226219366#iconfont') format('svg');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-guanbi2fill:before {
+  content: "\e724";
+}
+
+.icon-jiazai:before {
+  content: "\e699";
+}
+
+.icon-shuaxin:before {
+  content: "\e600";
+}
+
+.icon-wj-tp:before {
+  content: "\e7d9";
+}
+
+.icon-wj-pdf:before {
+  content: "\e7da";
+}
+
+.icon-a-wj-excel:before {
+  content: "\e7db";
+}
+
+.icon-wj-word:before {
+  content: "\e7dc";
+}
+
+.icon-rl-close:before {
+  content: "\e81a";
+}
+
+.icon-price-tag-3-line:before {
+  content: "\ec38";
+}
+
+.icon-arrow-down-s-line:before {
+  content: "\ee77";
+}
+
+.icon-arrow-left-line:before {
+  content: "\ee8e";
+}
+
+.icon-arrow-up-s-line:before {
+  content: "\eea6";
+}
+
+.icon-delete-bin-6-line:before {
+  content: "\eeca";
+}
+
+.icon-download-2-line:before {
+  content: "\eed5";
+}
+
+.icon-information-fill:before {
+  content: "\eefb";
+}
+
+.icon-question-fill:before {
+  content: "\ef25";
+}
+
+.icon-upload-2-line:before {
+  content: "\ef8a";
+}
+
+.icon-robot-2-fill:before {
+  content: "\e7a2";
+}
+
+.icon-robot-2-line:before {
+  content: "\e7a3";
+}
+
+.icon-home-heart-line:before {
+  content: "\e854";
+}
+
+.icon-home-smile-2-line:before {
+  content: "\e855";
+}
+
+.icon-bookmark-2-line:before {
+  content: "\e87c";
+}
+
+.icon-bookmark-3-line:before {
+  content: "\e87f";
+}
+
+.icon-stack-fill:before {
+  content: "\e906";
+}
+
+.icon-stack-line:before {
+  content: "\e908";
+}
+
+.icon-chat-smile-2-line:before {
+  content: "\e944";
+}
+
+.icon-article-fill:before {
+  content: "\eabf";
+}
+
+.icon-article-line:before {
+  content: "\eac3";
+}
+
+.icon-character-recognition-fill:before {
+  content: "\ee18";
+}
+
+.icon-character-recognition-line:before {
+  content: "\ee28";
+}
+
+.icon-reserved-fill:before {
+  content: "\ee4d";
+}
+
+.icon-reserved-line:before {
+  content: "\ee53";
+}
+
+.icon-settings-3-line:before {
+  content: "\ef40";
+}
+
+.icon-search-line:before {
+  content: "\ef45";
+}
+

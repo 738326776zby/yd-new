@@ -1,0 +1,20 @@
+.step0 {
+  display: inline-flex;
+  background: url(~@/app/components/evaluation/assets/step0.png) center center
+    no-repeat;
+  background-size: contain;
+}
+.step1 {
+  display: inline-flex;
+  background: url(~@/app/components/evaluation/assets/step1.png) center center
+    no-repeat;
+  background-size: contain;
+}
+
+.step2 {
+  display: inline-flex;
+  background: url(~@/app/components/evaluation/assets/step2.png) center center
+    no-repeat;
+  background-size: contain;
+}
+

@@ -1,0 +1,19 @@
+.actionIcon {
+    @apply bg-gray-500;
+    mask-image: url(~@/assets/action.svg);
+}
+
+
+.deleteActionItem {
+    @apply hover:bg-red-50 !important;
+}
+
+.actionItem {
+    color:#667085;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 4px;
+}
