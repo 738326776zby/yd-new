@@ -20,6 +20,7 @@ import {
   fetchModelToolList,
   fetchWorkflowToolList,
 } from "@/service/tools";
+import { fetcHhyydDataProviderList, fetchTestTool } from '@/service/ability-explore'
 import I18n from "@/context/i18n";
 import Button from "@/app/components/base/button";
 import Loading from "@/app/components/base/loading";
@@ -52,7 +53,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const { locale } = useContext(I18n);
   const language = getLanguage(locale);
   const { t } = useTranslation();
-
+  const [output,setOutput] = useState('')
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState<Tool[]>([]);
   const currTool = tools.find((tool) => tool.name === toolName);
@@ -65,20 +66,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const [tempSetting, setTempSetting] = useState(setting);
   const [currType, setCurrType] = useState("info");
   const isInfoActive = currType === "info";
-  const [example, setExample] = useState([
-    {
-      content: "12334",
-    },
-    {
-      content: "555",
-    },
-    {
-      content: "666",
-    },
-  ]);
-  const [paramsData, setParamsData] = useState<any>({
-    content: "12334",
-  });
+  const [paramsData, setParamsData] = useState<any>({});
   useEffect(() => {
     if (!collection) return;
 
@@ -89,7 +77,7 @@ const SettingBuiltInTool: FC<Props> = ({
           (async function () {
             if (isModel) resolve(await fetchModelToolList(collection.name));
             else if (isBuiltIn)
-              resolve(await fetchBuiltInToolList(collection.name));
+              resolve(await fetcHhyydDataProviderList(collection.name));
             else if (collection.type === CollectionType.workflow)
               resolve(await fetchWorkflowToolList(collection.id));
             else resolve(await fetchCustomToolList(collection.name));
@@ -100,8 +88,9 @@ const SettingBuiltInTool: FC<Props> = ({
         if (currTool) {
           const formSchemas = toolParametersToFormSchemas(currTool.parameters);
           setTempSetting(addDefaultValue(setting, formSchemas));
+
         }
-      } catch (e) {}
+      } catch (e) { }
       setIsLoading(false);
     })();
   }, [collection?.name, collection?.id, collection?.type]);
@@ -119,11 +108,9 @@ const SettingBuiltInTool: FC<Props> = ({
   })();
 
   const startTest = async () => {
-    console.log(paramsData)
-    console.log(infoSchemas)
     const errorList: string[] = []
     infoSchemas.forEach(infoItem => {
-      if (infoItem.required && paramsData[infoItem['name']] === undefined) {
+      if (infoItem.required && (paramsData[infoItem['name']] === '' || paramsData[infoItem['name']] === undefined)) {
         errorList.push(infoItem.label[language])
       }
     })
@@ -132,18 +119,84 @@ const SettingBuiltInTool: FC<Props> = ({
         type: 'error',
         message: `${errorList.join(";")} 字段为必填项`,
       })
-      return 
+      return
     }
-    // const res = await fetchTestTool({
-    //   name: currTool?.name,
-    //   params: paramsData
-    // })
-    // console.log(res)
+    const res = await fetchTestTool({
+      tool: currTool?.name || '',
+      params: paramsData,
+      collection: collection.name
+    })
+    setOutput(res)
   };
+  const getFormItem = (item: any) => {
+    const { type } = item
+    if (type === "number") {
+      return <Input
+        className="resize-none mt-4"
+        defaultValue="number"
+        value={paramsData[item.name]}
+        placeholder="请输入"
+        onChange={(e) => {
+          setParamsData({
+            ...paramsData,
+            [item.name]: e.target.value,
+          });
+        }}
+      />
+    } else if (type === 'boolean') {
+      return <Select
+        className="resize-none mt-4"
+        defaultValue={paramsData[item.name]}
+        items={[
+          {
+            //@ts-ignore
+            value: true,
+            name: "是",
+          },
+          {
+            //@ts-ignore
+            value: false,
+            name: "否",
+          },
+        ]}
+        onSelect={(e) => {
+          setParamsData({
+            ...paramsData,
+            [item.name]: e.value,
+          });
+        }}
+      />
+    } else if (type === 'select') {
+      return <Select
+        className="resize-none mt-4"
+        defaultValue={paramsData[item.name]}
+        onSelect={(e) => {
+          setParamsData({
+            ...paramsData,
+            [item.name]: e.value,
+          });
+        }}
+        items={(item.options || []).map((i: any) => ({ name: i.value, value: i.value }))}
+      />
+    } else {
+      //@ts-ignore
+      return <Textarea
+        className="h-[88px] resize-none mt-4"
+        defaultValue={paramsData[item.name]}
+        onChange={(e) => {
+          setParamsData({
+            ...paramsData,
+            [item.name]: e.target.value,
+          });
+        }}
+        placeholder="请输入"
+      />
+    }
+  }
   const infoUI = (
     <div className="pt-2">
       <div className="text-[14px]  text-[#495464] font-bold  mb-[7px]">
-     
+
         {t("tools.setBuiltInTools.toolDescription")}
       </div>
       <div className="mt-1 leading-[18px] text-xs font-normal text-[#495464]">
@@ -153,15 +206,16 @@ const SettingBuiltInTool: FC<Props> = ({
       {infoSchemas.length > 0 && (
         <div className="mt-6">
           <div className="text-[14px]  text-[#495464]  mb-[7px] font-bold">
-          
             {t("tools.setBuiltInTools.parameters")}
           </div>
           <div className="flex gap-4 mb-4">
-            {example.map((exampleItem, index) => {
+            {/* @ts-ignored */}
+            {currTool?.examples?.map((exampleItem, index) => {
               return (
                 <div
                   className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]"
                   onClick={() => {
+                    console.log(exampleItem)
                     setParamsData(exampleItem);
                   }}
                 >
@@ -193,56 +247,8 @@ const SettingBuiltInTool: FC<Props> = ({
                     {item.human_description?.[language]}
                   </div>
                 )}
-                {console.log(item)}
-                {item._type === "string" && (
-                  <Textarea
-                    className="h-[88px] resize-none mt-4"
-                    value={paramsData[item.name]}
-                    onChange={(e) => {
-                      setParamsData({
-                        ...paramsData,
-                        [item.name]: e.target.value,
-                      });
-                    }}
-                    placeholder="请输入"
-                  />
-                )}
-                {item._type === "number" && (
-                  <Input
-                    className="resize-none mt-4"
-                    type="number"
-                    value={paramsData[item.name]}
-                    placeholder="请输入"
-                    onChange={(e) => {
-                      setParamsData({
-                        ...paramsData,
-                        [item.name]: e.target.value,
-                      });
-                    }}
-                  />
-                )}
-                {item._type === "boolean" && (
-                  <Select
-                    className="resize-none mt-4"
-                    value={paramsData[item.name]}
-                    items={[
-                      {
-                        value: true,
-                        name: "是",
-                      },
-                      {
-                        value: false,
-                        name: "否",
-                      },
-                    ]}
-                    onSelect={(e) => {
-                      setParamsData({
-                        ...paramsData,
-                        [item.name]: e.value,
-                      });
-                    }}
-                  />
-                )}
+                {getFormItem(item)}
+
               </div>
             ))}
           </div>
@@ -258,7 +264,7 @@ const SettingBuiltInTool: FC<Props> = ({
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
           <Textarea
             className="h-[150px] resize-none mt-4"
-            value={""}
+            value={output}
             disabled={true}
             placeholder="请输入"
           />

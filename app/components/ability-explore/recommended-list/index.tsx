@@ -11,6 +11,7 @@ import ExploreContext from '@/context/ability-explore-context'
 import s from '../style.module.css'
 import type { InstalledApp } from '@/models/explore'
 import Card from './card'
+import {FetchInstallAppListReq} from '@/models/ability-explore'
 type ListProps = {
   className: string
 }
@@ -30,31 +31,29 @@ const List = ({ className }: ListProps) => {
       text: '对话助手',
     },
     {
-      value: 'advanced-chat',
+      value: 'agent-chat',
       text: '智能体',
     },
   ]
   const [keywords, setKeywords] = useState<string>('')
   const handleKeywordsChange = (value: string) => {
     setKeywords(value)
+    getList({
+      name:value
+    })
   }
   const [collectionList, setCollectionList] = useState<InstalledApp[]>([])
-  const filteredCollectionList = useMemo(() => {
-    return collectionList.filter((collection) => {
-      if (collection.app.mode !== activeTab) return false
-      if (keywords)
-        return Object.values(collection.app.name).some((value) =>
-          value.toLowerCase().includes(keywords.toLowerCase()),
-        )
-      return true
+ 
+  const getList = async (params:FetchInstallAppListReq) => {
+    const { installed_apps } = await fetchInstallAppList({
+      mode: activeTab,
+      name:keywords,
+      ...params
     })
-  }, [activeTab, keywords, collectionList])
-  const getList = async () => {
-    const { installed_apps } = await fetchInstallAppList()
     setCollectionList(installed_apps || [])
   }
   useEffect(() => {
-    getList()
+    getList({})
   }, [])
 
   const [currentProvider, setCurrentProvider] = useState<
@@ -104,6 +103,9 @@ const List = ({ className }: ListProps) => {
               value={activeTab}
               onChange={(state) => {
                 setActiveTab(state)
+                getList({
+                  mode:state
+                })
                 if (state !== activeTab) setCurrentProvider(undefined)
               }}
               options={recommendedOptions}
@@ -117,17 +119,18 @@ const List = ({ className }: ListProps) => {
             'pr-6 sm:grid-cols-1 md:grid-cols-2',
           )}
         >
-          {filteredCollectionList.map((collection) => (
+          {collectionList.map((collection) => (
             <Card
               active={currentProvider?.id === collection.id}
               onSelect={() => { 
                 router.push(`/ability-explore/installed/${collection.id}?${searchParams.toString()}`)
               }}
               key={collection.id}
+              data={collection}
               collection={collection.app}
             />
           ))}
-          {!filteredCollectionList.length && (
+          {!collectionList.length && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <Empty />
             </div>

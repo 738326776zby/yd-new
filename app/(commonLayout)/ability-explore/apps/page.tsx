@@ -16,6 +16,7 @@ const Apps = () => {
             <ThirdPartyToolsList className={(activeTabItem.key !== 'thirdPartyTools') ? 'hidden' : ''} />
             <CustomToolsList className={(activeTabItem.key !== 'customTools') ? 'hidden' : ''} />
             <RecommendedList className={(activeTabItem.key !== 'recommended') ? 'hidden' : ''} />
+            <DefaultToolsList className={(activeTabItem.key !== 'defaultTools') ? 'hidden' : ''}/>
         </>
     )
 }

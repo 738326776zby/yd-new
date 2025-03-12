@@ -1,5 +1,6 @@
 import { del, get, patch, post } from './base'
 import type { App, AppCategory } from '@/models/explore'
+import type { InstalledApp } from '@/models/explore'
 
 export const fetchAppList = () => {
   return get<{
@@ -13,7 +14,7 @@ export const fetchAppDetail = (id: string): Promise<any> => {
 }
 
 export const fetchInstalledAppList = (app_id?: string | null) => {
-  return get<any[]>(`/installed-apps${app_id ? `?app_id=${app_id}` : ''}`)
+  return get<{ installed_apps: InstalledApp[] }>(`/installed-apps${app_id ? `?app_id=${app_id}` : ''}`)
 }
 
 export const installApp = (id: string) => {

@@ -36,4 +36,5 @@ export type InstalledApp = {
   id: string
   uninstallable: boolean
   is_pinned: boolean
+  publish_time?:string
 }

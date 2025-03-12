@@ -1,7 +1,10 @@
 import { get, post } from './base'
 import type {
   Collection,
-  Tool
+  Tool,
+  FetchInstallAppListReq,
+  FetchTestToolReq,
+  FetchYdToolListReq
 } from '@/models/ability-explore'
 
 import type { InstalledApp } from '@/models/explore'
@@ -15,6 +18,20 @@ export const fetcHhyydDataProviderList = (collectionName: string) => {
 export const fetchThirdPartyToolsList = () => {
   return get<Collection[]>('/hyyd/other-tools-providers')
 }
-export const fetchInstallAppList = () => {
-  return get<{ installed_apps: InstalledApp[] }>('/hyyd/installed-apps')
+export const fetchInstallAppList = (params:FetchInstallAppListReq) => {
+  return get<{ installed_apps: InstalledApp[] }>('/hyyd/installed-apps', {
+    params
+  })
+}
+export const fetchTestTool = (data:FetchTestToolReq) => {
+  const { collection, tool, params } = data
+  return post<any>(`/hyyd/${collection}/${tool}/test`, {
+    body: params
+  })
+}
+
+export const fetchYdToolList = (body:FetchYdToolListReq) => {
+  return post<any>(`/hyyd/tools-providers`, {
+   body
+  })
 }

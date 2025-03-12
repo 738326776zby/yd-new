@@ -7,7 +7,6 @@ import ChatWithHistory from '@/app/components/base/chat/chat-with-history'
 import { fetchInstalledAppList } from '@/service/explore'
 import type { InstalledApp } from '@/models/explore'
 import { useSearchParams } from 'next/navigation'
-import { fetchInstallAppList } from '@/service/ability-explore'
 import Introduce from '@/app/components/ability-explore/introduce'
 export type ItargetDataProps = {
   id: string
@@ -22,9 +21,9 @@ const InstalledApp: FC<ItargetDataProps> = ({
   useEffect(()=>{
     const fetchData = async () => {
       //@ts-ignored
-      let { installed_apps } = isRecommended ? await fetchInstallAppList() : await fetchInstalledAppList()
-       //@ts-ignored
-      const target = installed_apps.filter((item) => item?.id == id)
+      let { installed_apps } = await fetchInstalledAppList()
+      //
+      const target = installed_apps.filter(item => item?.id == id)
       setTargetData(target.length? target[0] : undefined)
     }
     fetchData()
@@ -37,7 +36,6 @@ const InstalledApp: FC<ItargetDataProps> = ({
       </div>
     )
   }
-
   return (
     <div className='h-full py-2 pl-0 pr-2 sm:p-2 mt-4 flex gap-4' >
       {targetData.app.mode !== 'completion' && targetData.app.mode !== 'workflow' && (
@@ -50,7 +48,7 @@ const InstalledApp: FC<ItargetDataProps> = ({
         <TextGenerationApp isWorkflow isInstalledApp installedAppInfo={targetData}/>
       )}
       { 
-        isRecommended &&<Introduce/>
+        isRecommended && <Introduce target={targetData} />
       }
     </div>
   )

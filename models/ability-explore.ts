@@ -87,6 +87,7 @@ export type Tool = {
   description: any
   parameters: ToolParameter[]
   labels: string[]
+  examples?:any[]
 }
 
 export type ToolCredential = {
@@ -187,7 +188,20 @@ export type DefaultToolsListResponse = {
   wenben: DefaultToolsListItem
   wendangchuli: DefaultToolsListItem
 }
-
+export type FetchInstallAppListReq = {
+  mode?: string
+  name?:string
+}
+export type FetchTestToolReq = {
+  tool: string
+  params: Record<string, string>
+  collection:string
+}
+export type FetchYdToolListReq = {
+  scope?: string
+  label?: string[]
+  keyword?: string
+}
 
 
 
