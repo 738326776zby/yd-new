@@ -1,37 +1,39 @@
-'use client'
-import React, { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useContext } from 'use-context-selector'
-import { AuthHeaderPrefix, AuthType, CollectionType } from '@/models/ability-explore'
-import { fetchInstalledAppList } from '@/service/explore'
-import { useRouter } from 'next/navigation'
+"use client";
+import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useContext } from "use-context-selector";
+import {
+  AuthHeaderPrefix,
+  AuthType,
+  CollectionType,
+} from "@/models/ability-explore";
+import { fetchInstalledAppList } from "@/service/explore";
+import { useRouter } from "next/navigation";
 import type {
   Collection,
   CustomCollectionBackend,
   Tool,
   WorkflowToolProviderRequest,
   WorkflowToolProviderResponse,
-
-} from '@/models/ability-explore'
-import ToolItem from './tool-item'
-import cn from '@/utils/classnames'
-import I18n from '@/context/i18n'
-import { getLanguage } from '@/i18n/language'
-import Confirm from '@/app/components/base/confirm'
-import AppIcon from '@/app/components/base/app-icon'
-import Button from '@/app/components/base/button'
-import Indicator from '@/app/components/header/indicator'
+} from "@/models/ability-explore";
+import ToolItem from "./tool-item";
+import cn from "@/utils/classnames";
+import I18n from "@/context/i18n";
+import { getLanguage } from "@/i18n/language";
+import Confirm from "@/app/components/base/confirm";
+import AppIcon from "@/app/components/base/app-icon";
+import Button from "@/app/components/base/button";
+import Indicator from "@/app/components/header/indicator";
 import {
   LinkExternal02,
   Settings01,
-} from '@/app/components/base/icons/src/vender/line/general'
-import ConfigCredential from '@/app/components/tools/setting/build-in/config-credentials'
-import EditCustomToolModal from '@/app/components/tools/edit-custom-collection-modal'
-import WorkflowToolModal from '@/app/components/tools/workflow-tool'
-import Toast from '@/app/components/base/toast'
+} from "@/app/components/base/icons/src/vender/line/general";
+import ConfigCredential from "@/app/components/tools/setting/build-in/config-credentials";
+import EditCustomToolModal from "@/app/components/tools/edit-custom-collection-modal";
+import WorkflowToolModal from "@/app/components/tools/workflow-tool";
+import Toast from "@/app/components/base/toast";
 import {
   deleteWorkflowTool,
-  fetchBuiltInToolList,
   fetchCustomCollection,
   fetchCustomToolList,
   fetchModelToolList,
@@ -40,47 +42,50 @@ import {
   removeCustomCollection,
   saveWorkflowToolProvider,
   updateBuiltInToolCredential,
-  updateCustomCollection
-} from '@/service/tools'
-import { fetcHhyydDataProviderList } from '@/service/ability-explore'
-import { useModalContext } from '@/context/modal-context'
-import { useProviderContext } from '@/context/provider-context'
-import { ConfigurationMethodEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
-import Loading from '@/app/components/base/loading'
-import { useAppContext } from '@/context/app-context'
-import { useSearchParams } from 'next/navigation'
+  updateCustomCollection,
+} from "@/service/tools";
+import {
+  fetcHhyydDataProviderList,
+  fetcHhyydToolsProviderList,
+} from "@/service/ability-explore";
+import { useModalContext } from "@/context/modal-context";
+import { useProviderContext } from "@/context/provider-context";
+import { ConfigurationMethodEnum } from "@/app/components/header/account-setting/model-provider-page/declarations";
+import Loading from "@/app/components/base/loading";
+import { useAppContext } from "@/context/app-context";
+import { useSearchParams } from "next/navigation";
 type Props = {
-  collection: Collection
-  onRefreshData: () => void
-}
+  collection: Collection;
+  onRefreshData: () => void;
+  type: string;
+};
 
-const ProviderDetail = ({ collection, onRefreshData }: Props) => {
-  const { t } = useTranslation()
-  const { locale } = useContext(I18n)
-  const language = getLanguage(locale)
+const ProviderDetail = ({ collection, onRefreshData, type }: Props) => {
+  const { t } = useTranslation();
+  const { locale } = useContext(I18n);
+  const language = getLanguage(locale);
 
   const needAuth =
-    collection.allow_delete || collection.type === CollectionType.model
-  const isAuthed = collection.is_team_authorization
-  const isBuiltIn = collection.type === CollectionType.builtIn
-  const isModel = collection.type === CollectionType.model
-  const { isCurrentWorkspaceManager } = useAppContext()
-  const searchParams = useSearchParams()
-  const router = useRouter()
+    collection.allow_delete || collection.type === CollectionType.model;
+  const isAuthed = collection.is_team_authorization;
+  const isBuiltIn = collection.type === CollectionType.builtIn;
+  const isModel = collection.type === CollectionType.model;
+  const { isCurrentWorkspaceManager } = useAppContext();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   // 自定义页面单独的判断
-  const isCustomTools = searchParams.get('type') === 'customTools'
 
-  const [isDetailLoading, setIsDetailLoading] = useState(false)
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   // built in provider
-  const [showSettingAuth, setShowSettingAuth] = useState(false)
-  const { setShowModelModal } = useModalContext()
-  const { modelProviders: providers } = useProviderContext()
+  const [showSettingAuth, setShowSettingAuth] = useState(false);
+  const { setShowModelModal } = useModalContext();
+  const { modelProviders: providers } = useProviderContext();
   const showSettingAuthModal = () => {
     if (isModel) {
       const provider = providers.find(
-        (item) => item.provider === collection?.id,
-      )
+        (item) => item.provider === collection?.id
+      );
       if (provider) {
         setShowModelModal({
           payload: {
@@ -89,65 +94,65 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
             currentCustomConfigurationModelFixedFields: undefined,
           },
           onSaveCallback: () => {
-            onRefreshData()
+            onRefreshData();
           },
-        })
+        });
       }
     } else {
-      setShowSettingAuth(true)
+      setShowSettingAuth(true);
     }
-  }
+  };
   // custom provider
   const [customCollection, setCustomCollection] = useState<
     CustomCollectionBackend | WorkflowToolProviderResponse | null
-  >(null)
+  >(null);
   const [isShowEditCollectionToolModal, setIsShowEditCustomCollectionModal] =
-    useState(false)
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-  const [deleteAction, setDeleteAction] = useState('')
+    useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deleteAction, setDeleteAction] = useState("");
   const doUpdateCustomToolCollection = async (
-    data: CustomCollectionBackend,
+    data: CustomCollectionBackend
   ) => {
-    await updateCustomCollection(data)
-    onRefreshData()
+    await updateCustomCollection(data);
+    onRefreshData();
     Toast.notify({
-      type: 'success',
-      message: t('common.api.actionSuccess'),
-    })
-    setIsShowEditCustomCollectionModal(false)
-  }
+      type: "success",
+      message: t("common.api.actionSuccess"),
+    });
+    setIsShowEditCustomCollectionModal(false);
+  };
   const doRemoveCustomToolCollection = async () => {
-    await removeCustomCollection(collection?.name as string)
-    onRefreshData()
+    await removeCustomCollection(collection?.name as string);
+    onRefreshData();
     Toast.notify({
-      type: 'success',
-      message: t('common.api.actionSuccess'),
-    })
-    setIsShowEditCustomCollectionModal(false)
-  }
+      type: "success",
+      message: t("common.api.actionSuccess"),
+    });
+    setIsShowEditCustomCollectionModal(false);
+  };
   const getCustomProvider = useCallback(async () => {
-    setIsDetailLoading(true)
-    const res = await fetchCustomCollection(collection.name)
+    setIsDetailLoading(true);
+    const res = await fetchCustomCollection(collection.name);
     if (
       res.credentials.auth_type === AuthType.apiKey &&
       !res.credentials.api_key_header_prefix
     ) {
       if (res.credentials.api_key_value)
-        res.credentials.api_key_header_prefix = AuthHeaderPrefix.custom
+        res.credentials.api_key_header_prefix = AuthHeaderPrefix.custom;
     }
     setCustomCollection({
       ...res,
       labels: collection.labels,
       provider: collection.name,
-    })
-    setIsDetailLoading(false)
-  }, [collection.labels, collection.name])
+    });
+    setIsDetailLoading(false);
+  }, [collection.labels, collection.name]);
   // workflow provider
   const [isShowEditWorkflowToolModal, setIsShowEditWorkflowToolModal] =
-    useState(false)
+    useState(false);
   const getWorkflowToolProvider = useCallback(async () => {
-    setIsDetailLoading(true)
-    const res = await fetchWorkflowToolDetail(collection.id)
+    setIsDetailLoading(true);
+    const res = await fetchWorkflowToolDetail(collection.id);
     const payload = {
       ...res,
       parameters:
@@ -158,105 +163,114 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
             form: item.form,
             required: item.required,
             type: item.type,
-          }
+          };
         }) || [],
       labels: res.tool?.labels || [],
-    }
-    setCustomCollection(payload)
-    setIsDetailLoading(false)
-  }, [collection.id])
+    };
+    setCustomCollection(payload);
+    setIsDetailLoading(false);
+  }, [collection.id]);
   const removeWorkflowToolProvider = async () => {
-    await deleteWorkflowTool(collection.id)
-    onRefreshData()
+    await deleteWorkflowTool(collection.id);
+    onRefreshData();
     Toast.notify({
-      type: 'success',
-      message: t('common.api.actionSuccess'),
-    })
-    setIsShowEditWorkflowToolModal(false)
-  }
+      type: "success",
+      message: t("common.api.actionSuccess"),
+    });
+    setIsShowEditWorkflowToolModal(false);
+  };
   const updateWorkflowToolProvider = async (
     data: WorkflowToolProviderRequest &
       Partial<{
-        workflow_app_id: string
-        workflow_tool_id: string
-      }>,
+        workflow_app_id: string;
+        workflow_tool_id: string;
+      }>
   ) => {
-    await saveWorkflowToolProvider(data)
-    onRefreshData()
-    getWorkflowToolProvider()
+    await saveWorkflowToolProvider(data);
+    onRefreshData();
+    getWorkflowToolProvider();
     Toast.notify({
-      type: 'success',
-      message: t('common.api.actionSuccess'),
-    })
-    setIsShowEditWorkflowToolModal(false)
-  }
+      type: "success",
+      message: t("common.api.actionSuccess"),
+    });
+    setIsShowEditWorkflowToolModal(false);
+  };
   const onClickCustomToolDelete = () => {
-    setDeleteAction('customTool')
-    setShowConfirmDelete(true)
-  }
+    setDeleteAction("customTool");
+    setShowConfirmDelete(true);
+  };
   const onClickWorkflowToolDelete = () => {
-    setDeleteAction('workflowTool')
-    setShowConfirmDelete(true)
-  }
+    setDeleteAction("workflowTool");
+    setShowConfirmDelete(true);
+  };
   const handleConfirmDelete = () => {
-    if (deleteAction === 'customTool') doRemoveCustomToolCollection()
-    else if (deleteAction === 'workflowTool') removeWorkflowToolProvider()
+    if (deleteAction === "customTool") doRemoveCustomToolCollection();
+    else if (deleteAction === "workflowTool") removeWorkflowToolProvider();
 
-    setShowConfirmDelete(false)
-  }
+    setShowConfirmDelete(false);
+  };
   //演示跳转
   const jumpShowPage = async () => {
-    const { workflow_app_id } = await fetchWorkflowToolDetail(collection.id)
-    const { installed_apps }: any = await fetchInstalledAppList(workflow_app_id)
+    const { workflow_app_id } = await fetchWorkflowToolDetail(collection.id);
+    const { installed_apps }: any = await fetchInstalledAppList(
+      workflow_app_id
+    );
     if (installed_apps && installed_apps.length) {
-      const id = installed_apps[0].id
-      router.push(`/ability-explore/installed/${id}?${searchParams.toString()}`)
+      const id = installed_apps[0].id;
+      router.push(
+        `/ability-explore/installed/${id}?${searchParams.toString()}`
+      );
     }
-  }
+  };
   // ToolList
-  const [toolList, setToolList] = useState<Tool[]>([])
+  const [toolList, setToolList] = useState<Tool[]>([]);
   const getProviderToolList = useCallback(async () => {
-    setIsDetailLoading(true)
+    setIsDetailLoading(true);
     try {
       if (collection.type === CollectionType.builtIn) {
-        const list = await fetcHhyydDataProviderList(collection.name)
-        setToolList(list)
+        let list: Tool[] = [];
+        if (type === "owned") {
+          list = await fetcHhyydDataProviderList(collection.name);
+        } else if (type === "defaultTools") {
+          list = await fetcHhyydToolsProviderList(collection.name);
+        }
+        setToolList(list);
       } else if (collection.type === CollectionType.model) {
-        const list = await fetchModelToolList(collection.name)
-        setToolList(list)
+        const list = await fetchModelToolList(collection.name);
+        setToolList(list);
       } else if (collection.type === CollectionType.workflow) {
-        setToolList([])
+        setToolList([]);
       } else {
-        const list = await fetchCustomToolList(collection.name)
-        setToolList(list)
+        const list = await fetchCustomToolList(collection.name);
+        setToolList(list);
       }
-    } catch (e) { }
-    setIsDetailLoading(false)
-  }, [collection.name, collection.type])
+    } catch (e) {}
+    setIsDetailLoading(false);
+  }, [collection.name, collection.type]);
 
   useEffect(() => {
-    if (collection.type === CollectionType.custom) getCustomProvider()
-    if (collection.type === CollectionType.workflow) getWorkflowToolProvider()
-    getProviderToolList()
+    if (collection.type === CollectionType.custom) getCustomProvider();
+    if (collection.type === CollectionType.workflow) getWorkflowToolProvider();
+    getProviderToolList();
   }, [
     collection.name,
     collection.type,
     getCustomProvider,
     getProviderToolList,
     getWorkflowToolProvider,
-  ])
+  ]);
 
   return (
     <div className="px-6 py-3 ">
       <div className="flex items-center gap-2">
         <div className="relative shrink-0">
-          {typeof collection.icon === 'string' && (
+          {typeof collection.icon === "string" && (
             <div
               className="w-8 h-8 bg-center bg-cover bg-no-repeat rounded-md"
               style={{ backgroundImage: `url(${collection.icon})` }}
             />
           )}
-          {typeof collection.icon !== 'string' && (
+          {typeof collection.icon !== "string" && (
             <AppIcon
               size="small"
               icon={collection.icon.content}
@@ -279,62 +293,63 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
       <div className="flex gap-1 border-b-[0.5px] b/5order-black">
         {collection.type === CollectionType.builtIn && needAuth && (
           <Button
-            variant={isAuthed ? 'secondary' : 'primary'}
-            className={cn('shrink-0 my-3 w-full', isAuthed && 'bg-white')}
+            variant={isAuthed ? "secondary" : "primary"}
+            className={cn("shrink-0 my-3 w-full", isAuthed && "bg-white")}
             onClick={() => {
               if (
                 collection.type === CollectionType.builtIn ||
                 collection.type === CollectionType.model
               )
-                showSettingAuthModal()
+                showSettingAuthModal();
             }}
             disabled={!isCurrentWorkspaceManager}
           >
-            {isAuthed && <Indicator className="mr-2" color={'green'} />}
+            {isAuthed && <Indicator className="mr-2" color={"green"} />}
             <div
               className={cn(
-                'text-white leading-[18px] text-[13px] font-medium',
-                isAuthed && '!text-gray-700',
+                "text-white leading-[18px] text-[13px] font-medium",
+                isAuthed && "!text-gray-700"
               )}
             >
               {isAuthed
-                ? t('tools.auth.authorized')
-                : t('tools.auth.unauthorized')}
+                ? t("tools.auth.authorized")
+                : t("tools.auth.unauthorized")}
             </div>
           </Button>
         )}
         {collection.type === CollectionType.custom && !isDetailLoading && (
           <Button
-            className={cn('shrink-0 my-3 w-full')}
+            className={cn("shrink-0 my-3 w-full")}
             onClick={() => setIsShowEditCustomCollectionModal(true)}
           >
             <Settings01 className="mr-1 w-4 h-4 text-gray-500" />
             <div className="leading-5 text-sm font-medium text-gray-700">
-              {t('tools.createTool.editAction')}
+              {t("tools.createTool.editAction")}
             </div>
           </Button>
         )}
         {collection.type === CollectionType.workflow &&
           !isDetailLoading &&
-          customCollection &&
-          <>
-            <Button
-              variant="primary"
-              className={cn('shrink-0 my-3 w-[183px]')}
-              onClick={() => setIsShowEditWorkflowToolModal(true)}
-            >
-              {t('tools.createTool.editAction')}
-            </Button>
-            <Button
-              variant="primary"
-              className={cn('shrink-0 my-3 w-[183px]')}
-              onClick={() => {
-                jumpShowPage()
-              }}
-            >
-              演示
-            </Button>
-          </>}
+          customCollection && (
+            <>
+              <Button
+                variant="primary"
+                className={cn("shrink-0 my-3 w-[183px]")}
+                onClick={() => setIsShowEditWorkflowToolModal(true)}
+              >
+                {t("tools.createTool.editAction")}
+              </Button>
+              <Button
+                variant="primary"
+                className={cn("shrink-0 my-3 w-[183px]")}
+                onClick={() => {
+                  jumpShowPage();
+                }}
+              >
+                演示
+              </Button>
+            </>
+          )}
       </div>
       {/* Tools */}
       <div className="pt-3">
@@ -347,7 +362,7 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
           <div className="text-xs font-medium leading-6 text-gray-500">
             {collection.type === CollectionType.workflow && (
               <div className="text-[14px] font-semibold text-[#495464]">
-                {t('tools.createTool.toolInput.title').toLocaleUpperCase()}
+                {t("tools.createTool.toolInput.title").toLocaleUpperCase()}
               </div>
             )}
             {collection.type !== CollectionType.workflow && (
@@ -359,7 +374,7 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
               <>
                 <span className="px-1">·</span>
                 <span className="text-[#DC6803]">
-                  {t('tools.auth.setup').toLocaleUpperCase()}
+                  {t("tools.auth.setup").toLocaleUpperCase()}
                 </span>
               </>
             )}
@@ -395,8 +410,8 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
                     </span>
                     <span className="font-medium text-xs leading-[18px] text-[#ec4a0a]">
                       {item.required
-                        ? t('tools.createTool.toolInput.required')
-                        : ''}
+                        ? t("tools.createTool.toolInput.required")
+                        : ""}
                     </span>
                   </div>
                   <div className="h-[18px] leading-[18px] text-gray-500 text-xs">
@@ -412,22 +427,22 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
           collection={collection}
           onCancel={() => setShowSettingAuth(false)}
           onSaved={async (value) => {
-            await updateBuiltInToolCredential(collection.name, value)
+            await updateBuiltInToolCredential(collection.name, value);
             Toast.notify({
-              type: 'success',
-              message: t('common.api.actionSuccess'),
-            })
-            await onRefreshData()
-            setShowSettingAuth(false)
+              type: "success",
+              message: t("common.api.actionSuccess"),
+            });
+            await onRefreshData();
+            setShowSettingAuth(false);
           }}
           onRemove={async () => {
-            await removeBuiltInToolCredential(collection.name)
+            await removeBuiltInToolCredential(collection.name);
             Toast.notify({
-              type: 'success',
-              message: t('common.api.actionSuccess'),
-            })
-            await onRefreshData()
-            setShowSettingAuth(false)
+              type: "success",
+              message: t("common.api.actionSuccess"),
+            });
+            await onRefreshData();
+            setShowSettingAuth(false);
           }}
         />
       )}
@@ -449,14 +464,14 @@ const ProviderDetail = ({ collection, onRefreshData }: Props) => {
       )}
       {showConfirmDelete && (
         <Confirm
-          title={t('tools.createTool.deleteToolConfirmTitle')}
-          content={t('tools.createTool.deleteToolConfirmContent')}
+          title={t("tools.createTool.deleteToolConfirmTitle")}
+          content={t("tools.createTool.deleteToolConfirmContent")}
           isShow={showConfirmDelete}
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowConfirmDelete(false)}
         />
       )}
     </div>
-  )
-}
-export default ProviderDetail
+  );
+};
+export default ProviderDetail;

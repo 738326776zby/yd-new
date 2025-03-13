@@ -1,15 +1,13 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { RiCloseLine } from '@remixicon/react'
 import type { Collection } from '@/models/ability-explore'
 import cn from '@/utils/classnames'
-import { useTabSearchParams } from '@/hooks/use-tab-searchparams'
 import TabSliderNew from '@/app/components/base/tab-slider-new'
 import LabelFilter from '@/app/components/tools/labels/filter'
 import Input from '@/app/components/base/input'
 import ProviderCard from '@/app/components/tools/provider/card'
-import ProviderDetail from '@/app/components/ability-explore/provider/detail'
+import ProviderDetail from '@/app/components/tools/provider/detail'
 import Empty from '@/app/components/tools/add-tool-modal/empty'
 import { fetchCollectionList } from '@/service/tools'
 import ExploreContext from '@/context/ability-explore-context'
@@ -156,6 +154,7 @@ const List = ({ className }: ListProps) => {
           <ProviderDetail
             collection={currentProvider}
             onRefreshData={getList}
+            type="customTools"
           />
         )}
       </div>

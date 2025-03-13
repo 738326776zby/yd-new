@@ -15,12 +15,12 @@ import Textarea from "@/app/components/base/textarea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
 import {
-  fetchBuiltInToolList,
   fetchCustomToolList,
   fetchModelToolList,
   fetchWorkflowToolList,
+  fetchBuiltInToolList
 } from "@/service/tools";
-import { fetcHhyydDataProviderList, fetchTestTool } from '@/service/ability-explore'
+import { fetcHhyydDataProviderList, fetchTestTool,fetcHhyydToolsProviderList } from '@/service/ability-explore'
 import I18n from "@/context/i18n";
 import Button from "@/app/components/base/button";
 import Loading from "@/app/components/base/loading";
@@ -28,6 +28,9 @@ import { DiagonalDividingLine } from "@/app/components/base/icons/src/public/com
 import { getLanguage } from "@/i18n/language";
 import AppIcon from "@/app/components/base/app-icon";
 import Select from "@/app/components/base/select";
+import {
+  useSearchParams,
+} from 'next/navigation'
 import Toast from "@/app/components/base/toast";
 type Props = {
   collection: Collection;
@@ -67,6 +70,8 @@ const SettingBuiltInTool: FC<Props> = ({
   const [currType, setCurrType] = useState("info");
   const isInfoActive = currType === "info";
   const [paramsData, setParamsData] = useState<any>({});
+  const searchParams = useSearchParams()
+  const type = searchParams.get('type')
   useEffect(() => {
     if (!collection) return;
 
@@ -77,7 +82,14 @@ const SettingBuiltInTool: FC<Props> = ({
           (async function () {
             if (isModel) resolve(await fetchModelToolList(collection.name));
             else if (isBuiltIn)
-              resolve(await fetcHhyydDataProviderList(collection.name));
+              if (type === "defaultTools") {
+                resolve(await fetcHhyydToolsProviderList(collection.name));
+              } else if (type === 'owned') {
+                resolve(await fetcHhyydDataProviderList(collection.name));
+              } else { 
+                resolve(await fetchBuiltInToolList(collection.name))
+              }
+             
             else if (collection.type === CollectionType.workflow)
               resolve(await fetchWorkflowToolList(collection.id));
             else resolve(await fetchCustomToolList(collection.name));
@@ -126,16 +138,20 @@ const SettingBuiltInTool: FC<Props> = ({
       params: paramsData,
       collection: collection.name
     })
-    setOutput(res)
+    Toast.notify({
+      type: 'success',
+      message: '验证已完成，请查看下方输出',
+    })
+    setOutput(JSON.stringify(res))
   };
   const getFormItem = (item: any) => {
-    const { type } = item
+    const { _type:type } = item
     if (type === "number") {
       return <Input
         className="resize-none mt-4"
-        defaultValue="number"
-        value={paramsData[item.name]}
+        defaultValue={paramsData[item.name]}
         placeholder="请输入"
+        type="number"
         onChange={(e) => {
           setParamsData({
             ...paramsData,

@@ -17,6 +17,8 @@ import ConfigCredential from '@/app/components/tools/setting/build-in/config-cre
 import EditCustomToolModal from '@/app/components/tools/edit-custom-collection-modal'
 import WorkflowToolModal from '@/app/components/tools/workflow-tool'
 import Toast from '@/app/components/base/toast'
+import { fetchInstalledAppList } from "@/service/explore";
+import { useRouter,useSearchParams } from "next/navigation";
 import {
   deleteWorkflowTool,
   fetchBuiltInToolList,
@@ -39,16 +41,18 @@ import { useAppContext } from '@/context/app-context'
 type Props = {
   collection: Collection
   onRefreshData: () => void
+  type?: string
 }
 
 const ProviderDetail = ({
   collection,
   onRefreshData,
+  type
 }: Props) => {
   const { t } = useTranslation()
   const { locale } = useContext(I18n)
   const language = getLanguage(locale)
-
+  const router = useRouter();
   const needAuth = collection.allow_delete || collection.type === CollectionType.model
   const isAuthed = collection.is_team_authorization
   const isBuiltIn = collection.type === CollectionType.builtIn
@@ -120,6 +124,7 @@ const ProviderDetail = ({
   }, [collection.labels, collection.name])
   // workflow provider
   const [isShowEditWorkflowToolModal, setIsShowEditWorkflowToolModal] = useState(false)
+  const searchParams = useSearchParams();
   const getWorkflowToolProvider = useCallback(async () => {
     setIsDetailLoading(true)
     const res = await fetchWorkflowToolDetail(collection.id)
@@ -211,7 +216,19 @@ const ProviderDetail = ({
       getWorkflowToolProvider()
     getProviderToolList()
   }, [collection.name, collection.type, getCustomProvider, getProviderToolList, getWorkflowToolProvider])
-
+//演示跳转
+const jumpShowPage = async () => {
+  const { workflow_app_id } = await fetchWorkflowToolDetail(collection.id);
+  const { installed_apps }: any = await fetchInstalledAppList(
+    workflow_app_id
+  );
+  if (installed_apps && installed_apps.length) {
+    const id = installed_apps[0].id;
+    router.push(
+      `/ability-explore/installed/${id}?${searchParams.toString()}`
+    );
+  }
+};
   return (
     <div className='px-6 py-3'>
       <div className='flex items-center py-1 gap-2'>
@@ -262,22 +279,44 @@ const ProviderDetail = ({
         )}
         {collection.type === CollectionType.workflow && !isDetailLoading && customCollection && (
           <>
-            <Button
-              variant='primary'
-              className={cn('shrink-0 my-3 w-[183px]')}
-            >
-              <a className='flex items-center text-white' href={`/app/${(customCollection as WorkflowToolProviderResponse).workflow_app_id}/workflow`} rel='noreferrer' target='_blank'>
-                <div className='leading-5 text-sm font-medium'>{t('tools.openInStudio')}</div>
-                <LinkExternal02 className='ml-1 w-4 h-4' />
-              </a>
-            </Button>
-            <Button
-              className={cn('shrink-0 my-3 w-[183px]')}
-              onClick={() => setIsShowEditWorkflowToolModal(true)}
-              disabled={!isCurrentWorkspaceManager}
-            >
-              <div className='leading-5 text-sm font-medium text-gray-700'>{t('tools.createTool.editAction')}</div>
-            </Button>
+            {
+              type === 'customTools' ? <>
+                <Button
+                  variant="primary"
+                  className={cn("shrink-0 my-3 w-[183px]")}
+                  onClick={() => setIsShowEditWorkflowToolModal(true)}
+                >
+                  {t("tools.createTool.editAction")}
+                </Button>
+                <Button
+                  variant="primary"
+                  className={cn("shrink-0 my-3 w-[183px]")}
+                  onClick={() => {
+                    jumpShowPage();
+                  }}
+                >
+                  演示
+                </Button>
+              </> : <>
+                <Button
+                  variant='primary'
+                  className={cn('shrink-0 my-3 w-[183px]')}
+                >
+                  <a className='flex items-center text-white' href={`/app/${(customCollection as WorkflowToolProviderResponse).workflow_app_id}/workflow`} rel='noreferrer' target='_blank'>
+                    <div className='leading-5 text-sm font-medium'>{t('tools.openInStudio')}</div>
+                    <LinkExternal02 className='ml-1 w-4 h-4' />
+                  </a>
+                </Button>
+                <Button
+                  className={cn('shrink-0 my-3 w-[183px]')}
+                  onClick={() => setIsShowEditWorkflowToolModal(true)}
+                  disabled={!isCurrentWorkspaceManager}
+                >
+                  <div className='leading-5 text-sm font-medium text-gray-700'>{t('tools.createTool.editAction')}</div>
+                </Button>
+              </>
+            }
+
           </>
         )}
       </div>

@@ -1,125 +1,111 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { RiCloseLine } from '@remixicon/react'
+"use client";
+import React, { useEffect, useState } from "react";
+import { RiCloseLine } from "@remixicon/react";
 import type {
   Collection,
-  DefaultToolsListItem,
-  DefaultToolsListResponse,
-  FetchYdToolListReq
-} from '@/models/ability-explore'
-import cn from '@/utils/classnames'
-import { useTabSearchParams } from '@/hooks/use-tab-searchparams'
-import TabSliderNew from '@/app/components/base/tab-slider-new'
-import LabelFilter from '@/app/components/tools/labels/filter'
-import Input from '@/app/components/base/input'
-import ProviderCard from '@/app/components/tools/provider/card'
-import ProviderDetail from '@/app/components/tools/provider/detail'
-
-import s from '@/app/components/ability-explore/style.module.css'
-import { useContext } from 'use-context-selector'
-import ExploreContext from '@/context/ability-explore-context'
-import Empty from './empty'
-import { fetchYdToolList } from '@/service/ability-explore'
+  FetchYdToolListReq,
+  FetchYdToolListRes,
+  FetchYdToolListItemRes,
+} from "@/models/ability-explore";
+import cn from "@/utils/classnames";
+import Detail from "@/app/components/ability-explore/provider/detail";
+import TabSliderNew from "@/app/components/base/tab-slider-new";
+import LabelFilter from "@/app/components/tools/labels/filter";
+import Input from "@/app/components/base/input";
+import ProviderCard from "@/app/components/tools/provider/card";
+import s from "@/app/components/ability-explore/style.module.css";
+import { useContext } from "use-context-selector";
+import ExploreContext from "@/context/ability-explore-context";
+import Empty from "./empty";
+import { fetchYdToolList } from "@/service/ability-explore";
 
 type ListProps = {
-  className: string
-}
+  className: string;
+};
 const List = ({ className }: ListProps) => {
-  const [activeTab, setActiveTab] = useState('all')
-  const { activeTabItem } = useContext(ExploreContext)
+  const [activeTab, setActiveTab] = useState("all");
+  const { activeTabItem } = useContext(ExploreContext);
   const options = [
-    { value: 'all', text: '全部' },
-    { value: 'information_search', text: '信息检索类' },
-    { value: 'text_analyze', text: '文本解析类' },
-    { value: 'document_process', text: '文档处理类' },
-    { value: 'text_generation', text: '文本生成类' },
-    { value: 'expert_rule', text: '专家规则类' },
-    { value: 'multimodal', text: '多模态类' },
-  ]
-  const [tagFilterValue, setTagFilterValue] = useState<string[]>([])
+    { value: "all", text: "全部" },
+    { value: "information_search", text: "信息检索类" },
+    { value: "text_analyze", text: "文本解析类" },
+    { value: "document_process", text: "文档处理类" },
+    { value: "text_generation", text: "文本生成类" },
+    { value: "expert_rule", text: "专家规则类" },
+    { value: "multimodal", text: "多模态类" },
+  ];
+  const [tagFilterValue, setTagFilterValue] = useState<string[]>([]);
   const handleTagsChange = (value: string[]) => {
-    setTagFilterValue(value)
+    setTagFilterValue(value);
     getDefaultToolsList({
-      label: value
-    })
-  }
-  const [keywords, setKeywords] = useState<string>('')
+      label: value,
+    });
+  };
+  const [keywords, setKeywords] = useState<string>("");
+  const [allData, setAllData] = useState<FetchYdToolListRes>({});
   const handleKeywordsChange = (value: string) => {
-    setKeywords(value)
+    setKeywords(value);
     getDefaultToolsList({
-      keyword: value
-    })
-  }
-
-  const [collectionList, setCollectionList] = useState<Collection[]>([])
-  const [xinxijiansuo, setXinxijiansuo] =
-    useState<DefaultToolsListItem>(undefined)
-  const [wenben, setWenben] = useState<DefaultToolsListItem>(undefined)
-  const [wendangchuli, setWendangchuli] =
-    useState<DefaultToolsListItem>(undefined)
+      keyword: value,
+    });
+  };
 
   const getDefaultToolsList = async (params: FetchYdToolListReq) => {
-    const list = await fetchYdToolList({
+    const data = await fetchYdToolList({
       label: tagFilterValue,
       keyword: keywords,
       scope: activeTab,
-      ...params
-    })
-    console.log(list)
-    // @ts-ignore
-    // const { xinxijiansuo, wenben, wendangchuli } =
-    //   test as DefaultToolsListResponse
-    // setXinxijiansuo(xinxijiansuo)
-    // setWenben(wendangchuli)
-    // setWendangchuli(wendangchuli)
-  }
+      ...params,
+    });
+    setAllData(data);
+  };
   useEffect(() => {
     getDefaultToolsList({
-      scope: 'all'
-    })
-  }, [])
+      scope: "all",
+    });
+  }, []);
 
   const [currentProvider, setCurrentProvider] = useState<
     Collection | undefined
-  >()
-  useEffect(() => {
-    if (currentProvider && collectionList.length > 0) {
-      const newCurrentProvider = collectionList.find(
-        (collection) => collection.id === currentProvider.id,
-      )
-      setCurrentProvider(newCurrentProvider)
-    }
-  }, [collectionList, currentProvider])
+  >();
+  // useEffect(() => {
+  //   if (currentProvider && collectionList.length > 0) {
+  //     const newCurrentProvider = collectionList.find(
+  //       (collection) => collection.id === currentProvider.id,
+  //     )
+  //     setCurrentProvider(newCurrentProvider)
+  //   }
+  // }, [collectionList, currentProvider])
 
   return (
-    <div className={cn("flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow", className)}>
+    <div
+      className={cn(
+        "flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow",
+        className
+      )}
+    >
       <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow">
         <div
           className={cn(
-            'sticky top-0 flex justify-between items-center pt-4 px-12  leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2 mb-4',
-            currentProvider && 'pr-6',
+            "sticky top-0 flex justify-between items-center pt-4 px-12  leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2 mb-4",
+            currentProvider && "pr-6"
           )}
         >
           <div
             className={
-              'mb-1 text-xl font-semibold items-center justify-between flex flex-1'
+              "mb-1 text-xl font-semibold items-center justify-between flex flex-1"
             }
           >
-            <span className={s.textGradient}>
-              {activeTabItem?.mainTitle}
-            </span>
+            <span className={s.textGradient}>{activeTabItem?.mainTitle}</span>
             <div className="flex items-center gap-2">
-              <LabelFilter
-                value={tagFilterValue}
-                onChange={handleTagsChange}
-              />
+              <LabelFilter value={tagFilterValue} onChange={handleTagsChange} />
               <Input
                 showLeftIcon
                 showClearIcon
                 wrapperClassName="w-[200px]"
                 value={keywords}
                 onChange={(e) => handleKeywordsChange(e.target.value)}
-                onClear={() => handleKeywordsChange('')}
+                onClear={() => handleKeywordsChange("")}
               />
             </div>
           </div>
@@ -129,40 +115,48 @@ const List = ({ className }: ListProps) => {
           <TabSliderNew
             value={activeTab}
             onChange={(state) => {
-              setActiveTab(state)
+              setActiveTab(state);
               getDefaultToolsList({
-                scope: state
-              })
-              if (state !== activeTab) setCurrentProvider(undefined)
+                scope: state,
+              });
+              if (state !== activeTab) setCurrentProvider(undefined);
             }}
             options={options}
           />
         </div>
-        {(activeTab === 'xinxijiansuo' || activeTab === '') &&
-          xinxijiansuoList?.length > 0 && (
+        {options.map((optionItem) => {
+          //@ts-ignore
+          const target = allData[optionItem.value] as FetchYdToolListItemRes;
+          if (!target || !target?.items?.length) return null;
+          return (
             <>
               <div className="flex  px-12 items-center">
                 <span className="font-bold text-[14px] text-[#495464] mr-4">
-                  信息检索类
+                  {target?.nameCN}
                 </span>
                 <div>
                   <span className="icon iconfont icon-reserved-fill text-[#FF9F69] mr-1"></span>
                   <span className="text-[#495464] text-[14px]">
-                    共<span className="text-[#155EEF] mx-1">XX</span>
+                    共
+                    <span className="text-[#155EEF] mx-1">
+                      {target.provider_num}
+                    </span>
                     个工具集，合计
-                    <span className="text-[#155EEF] mx-1">XX</span>
+                    <span className="text-[#155EEF] mx-1">
+                      {target.tool_num}
+                    </span>
                     个工具
                   </span>
                 </div>
               </div>
               <div
                 className={cn(
-                  'relative grid content-start grid-cols-1 gap-4 px-12 pt-2 pb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0',
+                  "relative grid content-start grid-cols-1 gap-4 px-12 pt-2 pb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0",
                   currentProvider &&
-                  'pr-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+                  "pr-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}
               >
-                {xinxijiansuoList.map((collection) => (
+                {target.items.map((collection) => (
                   <ProviderCard
                     active={currentProvider?.id === collection.id}
                     onSelect={() => setCurrentProvider(collection)}
@@ -172,9 +166,40 @@ const List = ({ className }: ListProps) => {
                 ))}
               </div>
             </>
-          )}
+          );
+        })}
+         {/* @ts-ignore */}
+        {Object.values(allData)?.every(data => !data?.items?.length) && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Empty />
+          </div>
+        )}
       </div>
+      <div
+        className={cn(
+          "shrink-0 w-0 border-l-[0.5px] border-black/8 overflow-y-auto transition-all duration-200 ease-in-out bg-white",
+          currentProvider && "w-[420px]"
+        )}
+      >
+        {currentProvider && (
+          <Detail
+            collection={currentProvider}
+            onRefreshData={() => {
+              getDefaultToolsList({})
+            }}
+            type="defaultTools"
+          />
+        )}
+      </div>
+      {currentProvider && (
+        <div
+          className="absolute top-5 right-5 p-1 cursor-pointer"
+          onClick={() => setCurrentProvider(undefined)}
+        >
+          <RiCloseLine className="w-4 h-4" />
+        </div>
+      )}
     </div>
-  )
-}
-export default React.memo(List)
+  );
+};
+export default React.memo(List);

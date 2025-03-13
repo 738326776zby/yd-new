@@ -110,6 +110,7 @@ const List = ({ className }: {className:string}) => {
                     <Detail
                         collection={currentProvider}
                         onRefreshData={getProviderList}
+                         type="owned"
                     />
                 )}
             </div>

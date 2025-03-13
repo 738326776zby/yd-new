@@ -25,7 +25,7 @@ export const fetchInstallAppList = (params:FetchInstallAppListReq) => {
 }
 export const fetchTestTool = (data:FetchTestToolReq) => {
   const { collection, tool, params } = data
-  return post<any>(`/hyyd/${collection}/${tool}/test`, {
+  return post<any>(`/hyyd/tools-test/${collection}/${tool}`, {
     body: params
   })
 }
@@ -34,4 +34,7 @@ export const fetchYdToolList = (body:FetchYdToolListReq) => {
   return post<any>(`/hyyd/tools-providers`, {
    body
   })
+}
+export const fetcHhyydToolsProviderList = (collectionName: string) => {
+  return get<Tool[]>(`/hyyd/tools-provider/${collectionName}/tools`)
 }

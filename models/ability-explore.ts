@@ -2,16 +2,16 @@ import type { TypeWithI18N } from '@/app/components/header/account-setting/model
 
 
 export type NavItem = {
-    title: string
-    key: string
-    icon: string
-    category?: string
-  }
-  export type NavSection = {
-    mainTitle: string
-    list: NavItem[]
-    desc: string
-  }
+  title: string
+  key: string
+  icon: string
+  category?: string
+}
+export type NavSection = {
+  mainTitle: string
+  list: NavItem[]
+  desc: string
+}
 export enum LOC {
   tools = 'tools',
   app = 'app',
@@ -60,7 +60,7 @@ export type Collection = {
   is_team_authorization: boolean
   allow_delete: boolean
   labels: string[]
-  is_new:boolean
+  is_new: boolean
 }
 
 export type ToolParameter = {
@@ -87,7 +87,7 @@ export type Tool = {
   description: any
   parameters: ToolParameter[]
   labels: string[]
-  examples?:any[]
+  examples?: any[]
 }
 
 export type ToolCredential = {
@@ -181,8 +181,8 @@ export type WorkflowToolProviderResponse = {
 export type DefaultToolsListItem = {
   amount1: number
   amount2: number
-  list:Collection[]
-}|undefined
+  list: Collection[]
+} | undefined
 export type DefaultToolsListResponse = {
   xinxijiansuo: DefaultToolsListItem
   wenben: DefaultToolsListItem
@@ -190,19 +190,34 @@ export type DefaultToolsListResponse = {
 }
 export type FetchInstallAppListReq = {
   mode?: string
-  name?:string
+  name?: string
 }
 export type FetchTestToolReq = {
   tool: string
   params: Record<string, string>
-  collection:string
+  collection: string
 }
 export type FetchYdToolListReq = {
   scope?: string
   label?: string[]
   keyword?: string
 }
+export type FetchYdToolListItemRes = {
+  items: Collection[]
+  provider_num: number
+  tool_num: number
+  nameCN:string
+}
 
+export type FetchYdToolListRes = {
+  information_search?: FetchYdToolListItemRes
+  text_analyze?: FetchYdToolListItemRes
+  document_process?: FetchYdToolListItemRes
+  process_configuration_assistance?: FetchYdToolListItemRes
+  text_generation?: FetchYdToolListItemRes
+  expert_rule?: FetchYdToolListItemRes
+  multimodal?:FetchInstallAppListReq
+}
 
 
 
