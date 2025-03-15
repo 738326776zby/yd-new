@@ -110,6 +110,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
   const updateUserProfileAndVersion = useCallback(async () => {
     if (userProfileResponse && !userProfileResponse.bodyUsed) {
       const result = await userProfileResponse.json()
+      window.localStorage.setItem('userId', result?.id)
       setUserProfile(result)
       const current_version = userProfileResponse.headers.get('x-version')
       const current_env = process.env.NODE_ENV === 'development' ? 'DEVELOPMENT' : userProfileResponse.headers.get('x-env')

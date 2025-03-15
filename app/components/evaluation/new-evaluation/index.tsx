@@ -1,47 +1,71 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Radio, Upload, Select } from "antd";
 import { UploadOutlined, InfoCircleFilled } from "@ant-design/icons";
 import Toast from '@/app/components/base/toast'
+import { getCollectionsSchemelist, addschemeCollections } from '@/service/evaluation'
 type NewEvaluationPrincipleModalProps = {
-  setOpen: () => void;
+  setOpen?: () => void;
   open: boolean;
   target: any; // 这里之后需要改一下
+  onCancel?: () => void;
 };
 const NewEvaluationPrincipleModal = ({
   open,
   setOpen,
   target,
+  onCancel
 }: NewEvaluationPrincipleModalProps) => {
   const [showSelect, setShowSelect] = useState(false);
-  console.log(target);
-  const normFile = (e: any) => {
-    if (Array.isArray(e)) {
-      return e;
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState<any[]>([])
+
+  const NameByUrl = (url: string) => { 
+    if (!url) return '';
+    // 处理路径分隔符，兼容反斜杠和正斜杠
+    const normalizedUrl = url.replace(/\\/g, '/');
+    // 获取最后一个斜杠后的内容
+    const fileName = normalizedUrl.split('/').pop() || '';
+    // 移除查询参数
+    return fileName.split('?')[0];
+  }
+  useEffect(() => {
+    if (target?.evaluation_type == "规则评分") {
+      setShowSelect(true)
     }
-    return e?.fileList;
-  };
+    if (target?.id) {
+      if (target.path) {
+        setFileList([{
+          url: target.path,
+          name: NameByUrl(target.path)
+        }])
+      }
+      form?.setFieldsValue(target)
+    } else { 
+      setFileList([])
+    }
+  }, [target]);
   const formChange = (
     changedValues: Record<string, string>,
     allValues: any
   ) => {
     const key = Object.keys(changedValues)[0];
     const values = Object.values(changedValues)[0];
-    if (key === "d") {
-      setShowSelect(values == "two" ? true : false);
+    if (key === "evaluation_type") {
+      setShowSelect(values == "规则评分" ? true : false);
     }
   };
-  const beforeUpload = (file:any) => {
-    const isExcelOrCsv = file.type === 'application/vnd.ms-excel' || 
-                         file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                         file.type === 'text/csv';
+  const beforeUpload = (file: any) => {
+    const isExcelOrCsv = file.type === 'application/vnd.ms-excel' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.type === 'text/csv';
 
     if (!isExcelOrCsv) {
       Toast.notify({
         type: 'error',
         message: "您可以上传 Excel 或 CSV 文件!",
       })
-      return 
+      return
     }
 
     const isLt5M = file.size / 1024 / 1024 < 5;
@@ -52,24 +76,63 @@ const NewEvaluationPrincipleModal = ({
       })
     }
 
-    return isExcelOrCsv && isLt5M;
+    return false;
+  };
+  const opt = () => {
+    form.validateFields().then(async (values) => {
+      try {
+        const formData = new FormData();
+        // 将表单数据添加到 FormData
+        Object.keys(values).forEach(key => {
+
+          formData.append(key, values[key]);
+        });
+        // 将文件添加到 FormData
+        fileList.forEach(file => {
+          formData.append('file', file.originFileObj); // 这里的 'files[]' 是服务器接收文件时的字段名
+        });
+        //@ts-ignore
+        const res = await addschemeCollections(formData)
+
+        if (res.code === 200) {
+          Toast.notify({
+            type: 'success',
+            message: `${target?.id ? '更新' : '创建'}评测方案成功`
+          });
+          onCancel && onCancel();
+        } else {
+          throw new Error('请求失败');
+        }
+      } catch (error) {
+        Toast.notify({
+          type: 'error',
+          message: `${target?.id ? '更新' : '创建'}评测方案失败`
+        });
+      }
+    });
+  }
+
+  const uploadHandleChange = ({ fileList }: any) => {
+    console.log(fileList)
+    setFileList(fileList);
+  }
+  const closeModal = () => {
+    onCancel && onCancel();
+    setFileList([])
+    form.resetFields()
   };
   return (
     <Modal
       title={`${target?.id ? "编辑" : "新建"}评测方案`}
       width={640}
-      onCancel={() => {
-        setOpen();
-      }}
+      onCancel={closeModal}
       footer={
         <>
-          <Button type="primary" onClick={() => {}}>
+          <Button type="primary" onClick={opt}>
             确认
           </Button>
           <Button
-            onClick={() => {
-              setOpen();
-            }}
+            onClick={closeModal}
           >
             取消
           </Button>
@@ -83,39 +146,44 @@ const NewEvaluationPrincipleModal = ({
         layout="horizontal"
         className="mt-6"
         onValuesChange={formChange}
+        form={form}
+        colon={false}
+      
       >
         <Form.Item
           label="文件上传"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
         >
-          <Upload action="/upload.do" accept=".xls,.xlsx,.csv" beforeUpload={beforeUpload}>
-            <Button icon={<UploadOutlined />} type="primary" shape="round" size="small">文件上传</Button>
-            <>
-              <InfoCircleFilled className="text-sm text-[#FF9F69] ml-4 m-1" />
-              <span className="text-sm text-[#495464]">
-                支持上传excel或者csv格式文件，5M以内
-              </span>
-            </>
+          <Upload accept=".xls,.xlsx,.csv" beforeUpload={beforeUpload} onChange={uploadHandleChange} fileList={fileList} maxCount={1}>
+            {
+              !target?.id && <>
+                <Button icon={<UploadOutlined />} type="primary" shape="round" size="small">文件上传</Button>
+                <>
+                  <InfoCircleFilled className="text-sm text-[#FF9F69] ml-4 m-1" />
+                  <span className="text-sm text-[#495464]">
+                    支持上传excel或者csv格式文件，5M以内
+                  </span>
+                </>
+              </>
+            }
           </Upload>
         </Form.Item>
-        <Form.Item label="评测集名称" name="title">
-          <Input />
+        <Form.Item label="评测集名称" name="name" rules={[{ required: true, message: '评测集名称为必填项' }]}   >
+          <Input disabled={target?.id}/>
         </Form.Item>
-        <Form.Item label="适用说明" name="b">
+        <Form.Item label="适用说明" name="instructions" rules={[{ required: true, message: '适用说明为必填项' }]}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item label="评测方式简介" name="c">
+        <Form.Item label="评测方式简介" name="introduction">
           <Input.TextArea />
         </Form.Item>
-        <Form.Item label="评测方法" name="d">
+        <Form.Item label="评测方法" name="evaluation_type" rules={[{ required: true, message: '评测方法为必填项' }]}>
           <Radio.Group>
-            <Radio value="one"> 大模型评分 </Radio>
-            <Radio value="two"> 规则评分 </Radio>
-            <Radio value="three"> 调用外部评分模型 </Radio>
+            <Radio value="大模型评分"> 大模型评分 </Radio>
+            <Radio value="规则评分"> 规则评分 </Radio>
+            <Radio value="调用外部评分模型"> 调用外部评分模型 </Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item label="评测方法" name="e">
+        <Form.Item label=" " name="evaluation_content" >
           {showSelect ? (
             <Select
               options={[
@@ -123,9 +191,10 @@ const NewEvaluationPrincipleModal = ({
                 { value: "2", label: "Lucy" },
                 { value: "3", label: "Tom" },
               ]}
+              disabled={target?.id}
             />
           ) : (
-            <Input.TextArea />
+            <Input.TextArea   disabled={target?.id}/>
           )}
         </Form.Item>
       </Form>

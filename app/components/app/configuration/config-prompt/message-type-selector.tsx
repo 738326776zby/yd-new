@@ -10,7 +10,7 @@ type Props = {
   onChange: (value: PromptRole) => void
 }
 
-const allTypes = [PromptRole.system, PromptRole.user, PromptRole.assistant]
+const allTypes = [PromptRole.system, PromptRole., PromptRole.assistant]
 const MessageTypeSelector: FC<Props> = ({
   value,
   onChange,

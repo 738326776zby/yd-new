@@ -5,7 +5,7 @@ import {
   RiMoreFill
 } from '@remixicon/react'
 import cn from '@/utils/classnames'
-import type { EvaluationItem } from '@/models/evaluation'
+import type { EvaluationRecord } from '@/models/evaluation'
 import Input from '@/app/components/base/input'
 import s from '@/app/(commonLayout)/apps/style.module.css'
 import test from './test.json'
@@ -15,15 +15,18 @@ import { QuestionCircleFilled, DashOutlined } from '@ant-design/icons';
 import EvaluationPrincipleModal from '@/app/components/evaluation/evaluation-principle';
 import NewEvaluationPrincipleModal from '@/app/components/evaluation/new-evaluation'
 import CustomPopover from '@/app/components/base/popover'
-import { AppTypeIcon } from '@/app/components/app/type-selector'
 import { useRouter } from 'next/navigation'
+import { getCollectionsSchemelist,deleteschemeCollections,downloadCollections } from '@/service/evaluation'
+import { BaseResponse } from '@/models/evaluation'
+import { EventHandler } from 'lexical'
+import Toast from '@/app/components/base/toast'
 const DefaultToolsList = () => {
-  const [chooseTarget, setChooseTarget] = useState<EvaluationItem | undefined>()
-  const [allList, setAllList] = useState<EvaluationItem[]>([])
+  const [chooseTarget, setChooseTarget] = useState<EvaluationRecord | undefined>()
+  const [allList, setAllList] = useState<EvaluationRecord[]>([])
   const [keywords, setKeywords] = useState<string>('')
   const [open, setOpen] = useState(false)
   const [openNew, setOpenNew] = useState(false)
-  const router= useRouter()
+  const router = useRouter()
 
   const handleKeywordsChange = (value: string) => {
     setKeywords(value)
@@ -31,7 +34,7 @@ const DefaultToolsList = () => {
   const filterList = () => {
     return allList?.filter((collection) => {
       if (keywords) {
-        return collection.title.toLowerCase().includes(keywords.toLowerCase())
+        return collection.name.toLowerCase().includes(keywords.toLowerCase())
       }
       return true
     })
@@ -41,34 +44,50 @@ const DefaultToolsList = () => {
     const onMouseLeave = async () => {
       props.onClose?.()
     }
-    const onClickExport = async (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation()
-      props.onClick?.()
-      e.preventDefault()
-      // exportCheck()
-    }
+   
     const onClickDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation()
-      props.onClick?.()
       e.preventDefault()
-      // setShowConfirmDelete(true)
+      const res = await deleteschemeCollections({
+        id: target.id,
+        tenant_id: target.tenant_id
+      })
+      if (res.code === 200) {
+        Toast.notify({
+          type: 'success',
+          message: '删除评测方案成功'
+        });
+        getDefaultToolsList()
+      } else { 
+        Toast.notify({
+          type:'error',
+          message: res.message
+        });
+      }
     }
+    const downloadBlob = async (e:React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation()
+      downloadCollections(target.id,target.tenant_id)
+    
+    };
+    
     return (
-      <div className="relative w-full py-1" onMouseLeave={onMouseLeave}>
-        <button className={s.actionItem} onClick={() => {
+      <div className="relative w-full" onMouseLeave={onMouseLeave}>
+        <button className={s.actionItem} onClick={(e) => {
+          e.stopPropagation()
           setChooseTarget(target)
           setOpenNew(true)
         }}>
-          <span className={s.actionName}>编辑</span>
+          <span className={cn(s.actionName, 'text-[#667085]')}>编辑</span>
         </button>
-        <button className={s.actionItem} onClick={onClickExport}>
-          <span className={s.actionName}>下载</span>
+        <button className={s.actionItem} onClick={downloadBlob}>
+          <span className={cn(s.actionName, 'text-[#667085]')}>下载</span>
         </button>
         <div
-          className={cn(s.actionItem, s.deleteActionItem, 'group')}
+          className={cn(s.actionItem, 'group')}
           onClick={onClickDelete}
         >
-          <span className={cn(s.actionName, 'group-hover:text-red-500')}>
+          <span className={cn(s.actionName, 'text-[#667085]')}>
             删除
           </span>
         </div>
@@ -77,7 +96,11 @@ const DefaultToolsList = () => {
   }
 
   const getDefaultToolsList = async () => {
-    setAllList((test as EvaluationItem[]) || [])
+    // const res = await getCollectionsSchemelist()
+    const res = test as BaseResponse<{ list: EvaluationRecord[] }>
+    if (res.code === 200) {
+      setAllList(res.data.list || [])
+    }
 
   }
   useEffect(() => {
@@ -85,7 +108,7 @@ const DefaultToolsList = () => {
   }, [])
 
   return (
-    <div className="flex h-full relative flex overflow-hidden bg-gray-100 shrink-0 h-0 grow">
+    <div className="flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow">
       <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow">
         <div
           className={cn(
@@ -139,7 +162,7 @@ const DefaultToolsList = () => {
             <div
               onClick={(e) => {
                 e.preventDefault()
-               router.push(`/evaluation/manage`)
+                router.push(`/evaluation/manage?collections_id=${collection.id}&tenant_id=${collection.tenant_id}`)
               }}
               onMouseEnter={() => {
                 setChooseTarget(collection)
@@ -151,77 +174,59 @@ const DefaultToolsList = () => {
             >
               <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
                 <div className='relative shrink-0'>
-                  <AppIcon
+                  {/* <AppIcon
                     size="large"
                     iconType={collection?.icon_type}
                     icon={collection?.icon}
                     background={collection?.icon_background}
                     imageUrl={collection.icon_url}
                   />
-                  <AppTypeIcon type={collection.mode} wrapperClassName='absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-sm' className='w-3 h-3' />
+                  <AppTypeIcon type={collection.mode} wrapperClassName='absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-sm' className='w-3 h-3' /> */}
                 </div>
                 <div className='grow w-0 py-[1px]'>
                   <div className='flex items-center text-sm leading-5 font-semibold text-text-secondary'>
-                    <div className='truncate' title={collection.title}>{collection.title}</div>
+                    <div className='truncate' title={collection.name}>{collection.name}</div>
                   </div>
                   <div className='flex items-center text-[10px] leading-[18px] text-text-tertiary font-medium'>
-                    发布于{collection.publishTime}
+                    发布于{collection.created_time}
                   </div>
                 </div>
               </div>
               <div className='title-wrapper h-[90px] px-[14px] text-xs leading-normal text-text-tertiary flex flex-col gap-1'>
                 <div
                   className={cn('line-clamp-1')}
-                  title={collection.progress}
                 >
-                  来源：{collection.progress}
+                  来源：{collection.source}
                 </div>
                 <div
                   className={cn('line-clamp-1')}
-                  title={collection.progress}
+
                 >
-                  适用说明：{collection.progress}
+                  适用说明：{collection.instructions}
                 </div>
               </div>
               <div className={cn(
-                'absolute bottom-1 left-0 right-0 items-center shrink-0 pt-1 pl-[14px] pr-[6px] pb-[6px] h-[42px]',
+                ' bottom-1 left-0 right-0 items-center shrink-0 pt-1 pl-[14px] pr-[6px] pb-[6px] h-[42px] flex justify-end',
               )}>
-                {
-                  chooseTarget?.id === collection.id && <>
-                    <div className={cn('grow flex items-center gap-1 w-0')} onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                    }}>
-                    </div>
-                    {/* <div className=' group-hover:!flex shrink-0 mx-1 w-[1px] h-[14px]' /> */}
-                    <div className='group-hover:!flex shrink-0 justify-end'>
-                      <CustomPopover
-                        htmlContent={<Operations target={collection} />}
-                        position="br"
-                        trigger="click"
-                        btnElement={
-                          <div
-                            className='flex items-center justify-center w-8 h-8 cursor-pointer rounded-md'
-                          >
-                            <RiMoreFill className='w-4 h-4 text-text-tertiary' />
-                          </div>
-                        }
-                        btnClassName={open =>
-                          cn(
-                            open ? '!bg-black/5 !shadow-none' : '!bg-transparent',
-                            'h-8 w-8 !p-2 rounded-md border-none hover:!bg-black/5',
-                          )
-                        }
-                        // popupClassName={
-                        //   (app.mode === 'completion' || app.mode === 'chat')
-                        //     ? '!w-[256px] translate-x-[-224px]'
-                        //     : '!w-[160px] translate-x-[-128px]'
-                        // }
-                        className={'h-fit !z-20'}
-                      />
-                    </div>
-                  </>
-                }
+                <CustomPopover
+                    htmlContent={<Operations target={collection} />}
+                    position="br"
+                    trigger="click"
+                    btnElement={
+                      <div
+                        className='flex items-center justify-center w-8 h-8 cursor-pointer rounded-md'
+                      >
+                        <RiMoreFill className='w-4 h-4 text-text-tertiary' />
+                      </div>
+                    }
+                    btnClassName={open =>
+                      cn(
+                        open ? '!bg-black/5 !shadow-none' : '!bg-transparent',
+                        'h-8 w-8 !p-2 rounded-md border-none hover:!bg-black/5',
+                      )
+                    }
+                    className={'h-fit !z-20 ' }
+                  />
               </div>
             </div>
           ))}
@@ -232,7 +237,11 @@ const DefaultToolsList = () => {
       }} />
       <NewEvaluationPrincipleModal open={openNew} setOpen={() => {
         setOpenNew(!openNew)
-      }} target={chooseTarget} />
+      }} target={chooseTarget} onCancel={() => { 
+        setChooseTarget(undefined)
+        setOpenNew(false)
+        getDefaultToolsList()
+      }} />
     </div>
   )
 }

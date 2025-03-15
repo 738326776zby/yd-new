@@ -1,0 +1,68 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "success",
+  "data": {
+    "size": 10,
+    "startRow": 1,
+    "endRow": 10,
+    "pages": 3,
+    "prePage": 0,
+    "nextPage": 2,
+    "isFirstPage": true,
+    "isLastPage": false,
+    "hasPreviousPage": false,
+    "hasNextPage": true,
+    "navigatePages": 8,
+    "list": [
+      {
+        "id": "record_001",
+        "tenant_id": "tenant_002",
+        "collections_id": "col_001",
+        "collections_name": "通用对话评测集",
+        "user_id": "user_001",
+        "user_name": "张三",
+        "evaluation_object": "ChatGPT",
+        "task_description": "评估AI助手的对话能力",
+        "evaluation_time": "2024-01-15 10:00:00",
+        "results": null,
+        "results_file_path": null,
+        "status": 1,
+        "created_time": "2024-01-15 10:00:00",
+        "updated_time": "2024-01-15 10:00:00"
+      },
+      {
+        "id": "record_002",
+        "tenant_id": "tenant_001",
+        "collections_id": "col_002",
+        "collections_name": "代码生成评测集",
+        "user_id": "user_002",
+        "user_name": "李四",
+        "evaluation_object": "Claude",
+        "task_description": "评估AI的代码生成能力",
+        "evaluation_time": "2024-01-15 11:00:00",
+        "results": null,
+        "results_file_path": null,
+        "status": 2,
+        "created_time": "2024-01-15 11:00:00",
+        "updated_time": "2024-01-15 11:00:00"
+      },
+      {
+        "id": "record_003",
+        "tenant_id": "tenant_002",
+        "collections_id": "col_003",
+        "collections_name": "文本摘要评测集",
+        "user_id": "user_003",
+        "user_name": "王五",
+        "evaluation_object": "GPT-4",
+        "task_description": "评估AI的文本摘要能力",
+        "evaluation_time": "2024-01-15 12:00:00",
+        "results": null,
+        "results_file_path": null,
+        "status": 1,
+        "created_time": "2024-01-15 12:00:00",
+        "updated_time": "2024-01-15 12:00:00"
+      }
+    ]
+  }
+}

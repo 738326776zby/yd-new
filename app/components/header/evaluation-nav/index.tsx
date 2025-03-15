@@ -2,11 +2,14 @@
 
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
+import { useState } from 'react'
 import { useSelectedLayoutSegment } from 'next/navigation'
+import Nav from '../nav'
 import {
   RiHammerFill,
   RiHammerLine,
 } from '@remixicon/react'
+import { type NavItem } from '../nav/nav-selector'
 import classNames from '@/utils/classnames'
 type EvaluationsNavProps = {
   className?: string
@@ -18,21 +21,22 @@ const EvaluationsNav = ({
   const { t } = useTranslation()
   const selectedSegment = useSelectedLayoutSegment()
   const activated = selectedSegment?.includes('evaluation')
+  const [navItems, setNavItems] = useState<NavItem[]>([])
 
   return (
-    <Link href="/evaluation/apps" className={classNames(
-      'group text-sm font-medium',
-      activated && 'font-semibold bg-components-main-nav-nav-button-bg-active hover:bg-components-main-nav-nav-button-bg-active-hover shadow-md',
-      activated ? 'text-components-main-nav-nav-button-text-active' : 'text-components-main-nav-nav-button-text hover:bg-components-main-nav-nav-button-bg-hover',
-      className,
-    )}>
-      {
-        activated
-          ? <span className='icon iconfont icon-character-recognition-fill mr-1'></span>
-          : <span className='icon iconfont icon-character-recognition-line mr-1'></span>
-      }
-     效果评测
-    </Link>
+    <Nav
+        isApp
+        icon={<span className='icon iconfont icon-character-recognition-line'></span>}
+        activeIcon={<span className='icon iconfont icon-character-recognition-fill'></span>}
+        text={"工作流编排"}
+        activeSegment={['evaluation']}
+        link='/evaluation/apps'
+        // curNav={appDetail}
+        navs={navItems}
+        createText="效果评测"
+        // onCreate={openModal}
+        // onLoadmore={handleLoadmore}
+      />
   )
 }
 
