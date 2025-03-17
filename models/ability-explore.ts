@@ -52,7 +52,7 @@ export type Collection = {
   id: string
   name: string
   author: string
-  description: TypeWithI18N
+  description: string
   icon: string | Emoji
   label: TypeWithI18N
   type: CollectionType
@@ -219,10 +219,22 @@ export type FetchYdToolListRes = {
   multimodal?:FetchInstallAppListReq
 }
 
-
-
-
-
+export type HyydDataProviderReq = {
+  full_description: string
+  examples: {
+    [key: string]: string
+  }
+  icon: string
+  name:string
+}
+export type ThirdPartyDataListReqItem = {
+  background: string
+  description: string
+  icon: string
+  id: string
+  is_new: boolean
+  name: string
+}
 
 
 

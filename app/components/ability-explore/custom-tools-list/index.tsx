@@ -83,7 +83,7 @@ const List = ({ className }: ListProps) => {
       <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow mb-1">
         <div
           className={cn(
-            'sticky top-0 flex justify-between items-center pt-4 px-12 pb-2 leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2',
+            'sticky top-0 flex flex-col pt-4 px-12 pb-2 leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2',
             currentProvider && 'pr-6',
           )}
         >

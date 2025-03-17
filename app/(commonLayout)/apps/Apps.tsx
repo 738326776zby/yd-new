@@ -75,9 +75,7 @@ const Apps = () => {
     fetchAppList,
     { revalidateFirstPage: true },
   )
-  useEffect(() => {
-      console.log(2)
-  }, [])
+
   const anchorRef = useRef<HTMLDivElement>(null)
   const options = [
     { value: 'all', text: t('app.types.all'), icon: <RiApps2Line className='w-[14px] h-[14px] mr-1' /> },

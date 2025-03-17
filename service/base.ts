@@ -310,9 +310,11 @@ const baseFetch = <T>(
     needAllResponseContent,
     deleteContentType,
     getAbortController,
-    silent,
+    silent
   }: IOtherOptions,
 ): Promise<T> => {
+  console.log(fetchOptions)
+
   const options: typeof baseOptions & FetchOptionType = Object.assign({}, baseOptions, fetchOptions)
   if (getAbortController) {
     const abortController = new AbortController()
@@ -331,7 +333,15 @@ const baseFetch = <T>(
       options.headers.set('Content-Type', ContentType.json)
   }
 
-  const urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX
+  let urlPrefix = ''
+  //@ts-ignore
+  if (fetchOptions?.type === 'evaluation') {
+    //@ts-ignore
+    urlPrefix = process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX
+
+  }else{
+    urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX
+  }
   let urlWithPrefix = (url.startsWith('http://') || url.startsWith('https://'))
     ? url
     : `${urlPrefix}${url.startsWith('/') ? url : `/${url}`}`

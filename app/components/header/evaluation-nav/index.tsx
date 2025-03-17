@@ -28,7 +28,7 @@ const EvaluationsNav = ({
         isApp
         icon={<span className='icon iconfont icon-character-recognition-line'></span>}
         activeIcon={<span className='icon iconfont icon-character-recognition-fill'></span>}
-        text={"工作流编排"}
+        text={"效果评测"}
         activeSegment={['evaluation']}
         link='/evaluation/apps'
         // curNav={appDetail}

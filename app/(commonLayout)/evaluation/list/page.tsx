@@ -17,17 +17,22 @@ import NewEvaluationPrincipleModal from '@/app/components/evaluation/new-evaluat
 import CustomPopover from '@/app/components/base/popover'
 import { useRouter } from 'next/navigation'
 import { getCollectionsSchemelist,deleteschemeCollections,downloadCollections } from '@/service/evaluation'
-import { BaseResponse } from '@/models/evaluation'
-import { EventHandler } from 'lexical'
 import Toast from '@/app/components/base/toast'
+import EvaluationContext from '@/context/evaluation-context'
+import { useContext } from 'use-context-selector'
+const sourceMap = {
+  0: '本地上传',
+  1: '平台预置'
+}
 const DefaultToolsList = () => {
+  const { userInfo } = useContext(EvaluationContext)
   const [chooseTarget, setChooseTarget] = useState<EvaluationRecord | undefined>()
   const [allList, setAllList] = useState<EvaluationRecord[]>([])
   const [keywords, setKeywords] = useState<string>('')
   const [open, setOpen] = useState(false)
   const [openNew, setOpenNew] = useState(false)
   const router = useRouter()
-
+  console.log(userInfo)
   const handleKeywordsChange = (value: string) => {
     setKeywords(value)
   }
@@ -58,54 +63,62 @@ const DefaultToolsList = () => {
           message: '删除评测方案成功'
         });
         getDefaultToolsList()
-      } else { 
+      } else {
         Toast.notify({
-          type:'error',
+          type: 'error',
           message: res.message
         });
       }
     }
-    const downloadBlob = async (e:React.MouseEvent<HTMLButtonElement>) => {
+    const downloadBlob = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
-      downloadCollections(target.id,target.tenant_id)
+      downloadCollections(target.id, target.tenant_id)
     
     };
     
     return (
       <div className="relative w-full" onMouseLeave={onMouseLeave}>
-        <button className={s.actionItem} onClick={(e) => {
-          e.stopPropagation()
-          setChooseTarget(target)
-          setOpenNew(true)
-        }}>
-          <span className={cn(s.actionName, 'text-[#667085]')}>编辑</span>
-        </button>
+        {target.editStatus && (
+          <button className={s.actionItem} onClick={(e) => {
+            e.stopPropagation()
+            setChooseTarget(target)
+            setOpenNew(true)
+          }}>
+            <span className={cn(s.actionName, 'text-[#667085]')}>编辑</span>
+          </button>
+        )}
+
         <button className={s.actionItem} onClick={downloadBlob}>
           <span className={cn(s.actionName, 'text-[#667085]')}>下载</span>
         </button>
-        <div
-          className={cn(s.actionItem, 'group')}
-          onClick={onClickDelete}
-        >
-          <span className={cn(s.actionName, 'text-[#667085]')}>
-            删除
-          </span>
-        </div>
+        {
+          target.delStatus && (
+            <div
+              className={cn(s.actionItem, 'group')}
+              onClick={onClickDelete}
+            >
+              <span className={cn(s.actionName, 'text-[#667085]')}>
+                删除
+              </span>
+            </div>
+          )
+        }
       </div>
     )
   }
 
   const getDefaultToolsList = async () => {
-    // const res = await getCollectionsSchemelist()
-    const res = test as BaseResponse<{ list: EvaluationRecord[] }>
+    const res = await getCollectionsSchemelist(userInfo?.tenant_id||'',userInfo?.user_id||''  )
     if (res.code === 200) {
       setAllList(res.data.list || [])
     }
 
   }
   useEffect(() => {
-    getDefaultToolsList()
-  }, [])
+    if(userInfo){
+      getDefaultToolsList()
+    }
+  }, [userInfo])
 
   return (
     <div className="flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow">
@@ -196,11 +209,10 @@ const DefaultToolsList = () => {
                 <div
                   className={cn('line-clamp-1')}
                 >
-                  来源：{collection.source}
+                  来源：{sourceMap[collection.source as keyof typeof sourceMap]}
                 </div>
                 <div
                   className={cn('line-clamp-1')}
-
                 >
                   适用说明：{collection.instructions}
                 </div>

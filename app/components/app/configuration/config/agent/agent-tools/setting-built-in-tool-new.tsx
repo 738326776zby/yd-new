@@ -231,7 +231,6 @@ const SettingBuiltInTool: FC<Props> = ({
                 <div
                   className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]"
                   onClick={() => {
-                    console.log(exampleItem)
                     setParamsData(exampleItem);
                   }}
                 >

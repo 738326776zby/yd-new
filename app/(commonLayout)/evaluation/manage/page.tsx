@@ -193,8 +193,6 @@ const AppList = () => {
         <div className='flex items-center justify-between p-4'>
           <div>
             <Checkbox value={!!tableParams.user_id} onChange={(e) => {
-              console.log(e.target.checked)
-              console.log(window.localStorage.getItem('userId'))
               getTableList({
                 user_id: e.target.checked ? window.localStorage.getItem('userId')||'' : ''
               })

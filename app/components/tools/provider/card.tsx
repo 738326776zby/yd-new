@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangboya3 zhangboya3@xiaomi.com
+ * @Date: 2024-12-30 10:43:42
+ * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
+ * @LastEditTime: 2025-03-18 00:04:03
+ * @FilePath: /yd-new/app/components/tools/provider/card.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 'use client'
 import { useMemo } from 'react'
 import { useContext } from 'use-context-selector'
@@ -14,12 +22,16 @@ type Props = {
   active: boolean
   collection: Collection
   onSelect: () => void
+  className?: string
+  style?: React.CSSProperties
 }
 
 const ProviderCard = ({
   active,
   collection,
   onSelect,
+  className,
+  style
 }: Props) => {
   const { t } = useTranslation()
   const { locale } = useContext(I18n)
@@ -34,12 +46,12 @@ const ProviderCard = ({
       return label?.label[language]
     }).filter(Boolean).join(', ')
   }, [collection.labels, labelList, language])
-
   return (
-    <div className={cn('group col-span-1 bg-white relative border-2 border-solid border-transparent rounded-xl shadow-sm min-h-[160px] flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg', active && '!border-primary-400')} onClick={onSelect}>
+    <div className={cn('group col-span-1 bg-white relative border-2 border-solid border-transparent rounded-xl shadow-sm min-h-[160px] flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg', active && '!border-primary-400', className && className)} onClick={onSelect} key={collection.id} style={style || {}}>
       { 
         collection.is_new && <IsNew className="absolute top-[-2px] right-4" />
       }
+      
       <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
         <div className='relative shrink-0'>
           {typeof collection.icon === 'string' && (
@@ -72,6 +84,8 @@ const ProviderCard = ({
       >
         {collection.description[language]}
       </div>
+      {/* @ts-ignore */}
+      {collection?.background_image &&  <div className='absolute bottom-0 right-0 w-[104px] h-[104px]' style={{ backgroundSize:'100% 100%',backgroundImage: `url(${collection.background_image})` }} />}
       {collection.labels?.length > 0 && (
         <div className='flex items-center shrink-0 mt-1 pt-1 pl-[14px] pr-[6px] pb-[6px] h-[42px]'>
           <div className='relative w-full flex items-center gap-1 py-[7px] rounded-md text-gray-500' title={labelContent}>

@@ -4,12 +4,12 @@ import { RiCloseLine } from "@remixicon/react";
 import cn from "@/utils/classnames";
 import Input from "@/app/components/base/input";
 import Card from "./card";
-import Detail from "@/app/components/ability-explore/provider/detail";
 import Empty from "./empty";
 import { fetchHyydDataProvidersList } from "@/service/ability-explore";
 import ExploreContext from "@/context/ability-explore-context";
 import { useContext } from "use-context-selector";
 import s from "../style.module.css";
+import { useRouter } from "next/navigation";
 import type { Collection } from "@/models/ability-explore";
 
 
@@ -19,6 +19,7 @@ const List = ({ className }: {className:string}) => {
     const handleKeywordsChange = (value: string) => {
         setKeywords(value);
     };
+    const router = useRouter()
     const { activeTabItem } = useContext(ExploreContext);
     const [collectionList, setCollectionList] = useState<Collection[]>([]);
     const filteredCollectionList = useMemo(() => {
@@ -55,7 +56,7 @@ const List = ({ className }: {className:string}) => {
             <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow mb-1">
                 <div
                     className={cn(
-                        "sticky top-0 flex justify-between items-center pt-4 px-12 pb-2 leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2",
+                        "sticky top-0 flex flex-col pt-4 px-12 pb-2 leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2",
                         currentProvider && "pr-6"
                     )}
                 >
@@ -88,7 +89,9 @@ const List = ({ className }: {className:string}) => {
                     {filteredCollectionList.map((collection) => (
                         <Card
                             active={currentProvider?.id === collection.id}
-                            onSelect={() => setCurrentProvider(collection)}
+                            onSelect={() => { 
+                                router.push(`/ability-explore/owned/${collection.id}?type=owned`)
+                            }}
                             key={collection.id}
                             collection={collection}
                         />
@@ -100,28 +103,6 @@ const List = ({ className }: {className:string}) => {
                     )}
                 </div>
             </div>
-            <div
-                className={cn(
-                    "shrink-0 w-0 border-l-[0.5px] border-black/8 overflow-y-auto transition-all duration-200 ease-in-out bg-white",
-                    currentProvider && "w-[420px]"
-                )}
-            >
-                {currentProvider && (
-                    <Detail
-                        collection={currentProvider}
-                        onRefreshData={getProviderList}
-                         type="owned"
-                    />
-                )}
-            </div>
-            {currentProvider && (
-                <div
-                    className="absolute top-5 right-5 p-1 cursor-pointer"
-                    onClick={() => setCurrentProvider(undefined)}
-                >
-                    <RiCloseLine className="w-4 h-4" />
-                </div>
-            )}
         </div>
     );
 };

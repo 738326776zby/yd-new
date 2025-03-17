@@ -4,16 +4,18 @@ import type {
   Tool,
   FetchInstallAppListReq,
   FetchTestToolReq,
-  FetchYdToolListReq
+  FetchYdToolListReq,
+  HyydDataProviderReq,
+  ThirdPartyDataListReqItem
 } from '@/models/ability-explore'
 
 import type { InstalledApp } from '@/models/explore'
 export const fetchHyydDataProvidersList = () => {
-  return get<Collection[]>('/hyyd/data-providers')
+  return get<Collection[]>('/hyyd/hyyd-data-list')
 }
 
-export const fetcHhyydDataProviderList = (collectionName: string) => {
-  return get<Tool[]>(`/hyyd/data-provider/${collectionName}/tools`)
+export const fetcHhyydDataProvider = (id: string) => {
+  return get<HyydDataProviderReq>(`/hyyd/hyyd-data/${id}`)
 }
 export const fetchThirdPartyToolsList = () => {
   return get<Collection[]>('/hyyd/other-tools-providers')
@@ -37,4 +39,9 @@ export const fetchYdToolList = (body:FetchYdToolListReq) => {
 }
 export const fetcHhyydToolsProviderList = (collectionName: string) => {
   return get<Tool[]>(`/hyyd/tools-provider/${collectionName}/tools`)
+}
+
+
+export const fetchThirdPartyDataList = () => {
+  return get<ThirdPartyDataListReqItem[]>(`/hyyd/third-party-data-list`)
 }

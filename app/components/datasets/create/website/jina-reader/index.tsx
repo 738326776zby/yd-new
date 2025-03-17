@@ -182,7 +182,6 @@ const JinaReader: FC<Props> = ({
     }
     catch (e) {
       setCrawlErrorMessage(t(`${I18N_PREFIX}.unknownError`)!)
-      console.log(e)
     }
     finally {
       setStep(Step.finished)

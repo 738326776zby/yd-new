@@ -1,21 +1,35 @@
+/*
+ * @Author: zhangboya3 zhangboya3@xiaomi.com
+ * @Date: 2025-03-15 10:43:54
+ * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
+ * @LastEditTime: 2025-03-18 01:47:49
+ * @FilePath: /yd-new/service/evaluation.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEU
+ */
 import { get, post } from './base'
-import { BaseResponse, EvaluationRecord, CollectionsAddschemeRes, CollectionsDeletescheme, GetRecordlistReq, PageinfoProps, RecordTableListItem } from '@/models/evaluation'
-export const getCollectionsSchemelist = () => {
-    return get<BaseResponse<{ list: EvaluationRecord[] }>>('/auto-evaluate/api/v1/evaluate/collections/schemelist')
+import { BaseResponse, EvaluationRecord, CollectionsAddschemeRes, CollectionsDeletescheme, GetRecordlistReq, PageinfoProps, RecordTableListItem,UserInfo } from '@/models/evaluation'
+export const getCollectionsSchemelist = (tenant_id:string,user_id:string) => {
+    return get<BaseResponse<{ list: EvaluationRecord[] }>>('/api/v1/evaluate/collections/schemelist', {
+        type:'evaluation',
+        params:{
+            tenant_id,
+            user_id
+        }
+    })
 }
 export const addschemeCollections = (body: CollectionsAddschemeRes) => {
-    return post<BaseResponse<null>>('/auto-evaluate/api/v1/evaluate/collections/addscheme', { body }, { bodyStringify: false, deleteContentType: true })
+    return post<BaseResponse<null>>('/api/v1/evaluate/collections/addscheme', { body }, { bodyStringify: false, deleteContentType: true })
 }
 export const deleteschemeCollections = (body: CollectionsDeletescheme) => {
-    return post<BaseResponse<null>>('/auto-evaluate/api/v1/evaluate/collections/deletescheme', { body })
+    return post<BaseResponse<null>>('/api/v1/evaluate/collections/deletescheme', { body })
 }
 export const getRecordlist = (body: GetRecordlistReq) => {
-    return post<BaseResponse<PageinfoProps<RecordTableListItem[]>>>('/auto-evaluate/api/v1/evaluate/collections/recordlist', {
+    return post<BaseResponse<PageinfoProps<RecordTableListItem[]>>>('/api/v1/evaluate/collections/recordlist', {
         body
     })
 }
 export const getEvaluationObjectList = () => {
-    return get<BaseResponse<string[]>>('/auto-evaluate/api/v1/evaluate/record/evaluationObjectList')
+    return get<BaseResponse<string[]>>('/api/v1/evaluate/record/evaluationObjectList')
 }
 const downloadCommon = async (response: any) => {
     // 从响应头中获取文件名
@@ -40,12 +54,15 @@ const downloadCommon = async (response: any) => {
     window.URL.revokeObjectURL(url);
 }
 export const downloadReviews = async (id: string,tenant_id:string) => {
-    const response = await fetch(`/auto-evaluate/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`);
+    const response = await fetch(`/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`);
     downloadCommon(response)
 
 }
 export const downloadCollections = async (id: string, tenant_id: string) => {
-    const response = await fetch(`/auto-evaluate/api/v1/evaluate/collections/download?id=${id}&tenant_id=${tenant_id}`);
+    const response = await fetch(`/api/v1/evaluate/collections/download?id=${id}&tenant_id=${tenant_id}`);
     downloadCommon(response)
 
+}
+export const fetchUserInfo = () => {
+    return get<UserInfo>('/hyyd/user/info')
 }

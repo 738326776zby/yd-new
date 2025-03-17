@@ -15,6 +15,8 @@ export interface EvaluationRecord {
   evaluation_content: string
   created_time: string
   updated_time: string
+  delStatus: boolean
+  editStatus:boolean
 }
 
 export interface BaseResponse<T> {
@@ -77,4 +79,13 @@ export type PageinfoProps<T> = {
   hasNextPage: boolean
   navigatePages: number
   list: T[]
+}
+
+export type UserInfo = {
+  email: string
+  is_admin: boolean
+  is_editor: boolean
+  tenant_id: string
+  user_id: string
+  user_name: string
 }

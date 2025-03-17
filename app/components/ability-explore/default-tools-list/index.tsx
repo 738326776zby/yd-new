@@ -27,10 +27,10 @@ const List = ({ className }: ListProps) => {
   const { activeTabItem } = useContext(ExploreContext);
   const options = [
     { value: "all", text: "全部" },
-    { value: "information_search", text: "信息检索类" },
-    { value: "text_analyze", text: "文本解析类" },
-    { value: "document_process", text: "文档处理类" },
-    { value: "text_generation", text: "文本生成类" },
+    { value: "information_search", text: "信息检索类", color: "#EFF4FE" },
+    { value: "text_analyze", text: "文本解析类", color: "#FFF5F0" },
+    { value: "document_process", text: "文档处理类", color: "#DDFDF2" },
+    { value: "text_generation", text: "文本生成类", color: "#F0E2FF" },
     { value: "expert_rule", text: "专家规则类" },
     { value: "multimodal", text: "多模态类" },
   ];
@@ -68,14 +68,7 @@ const List = ({ className }: ListProps) => {
   const [currentProvider, setCurrentProvider] = useState<
     Collection | undefined
   >();
-  // useEffect(() => {
-  //   if (currentProvider && collectionList.length > 0) {
-  //     const newCurrentProvider = collectionList.find(
-  //       (collection) => collection.id === currentProvider.id,
-  //     )
-  //     setCurrentProvider(newCurrentProvider)
-  //   }
-  // }, [collectionList, currentProvider])
+
 
   return (
     <div
@@ -87,7 +80,7 @@ const List = ({ className }: ListProps) => {
       <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow">
         <div
           className={cn(
-            "sticky top-0 flex justify-between items-center pt-4 px-12  leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2 mb-4",
+            "sticky top-0 flex flex-col pt-4 px-12  leading-[56px] bg-gray-100 z-20 flex-wrap gap-y-2 mb-4",
             currentProvider && "pr-6"
           )}
         >
@@ -124,51 +117,61 @@ const List = ({ className }: ListProps) => {
             options={options}
           />
         </div>
-        {options.map((optionItem) => {
+        {options.slice(1).map((optionItem, index) => {
           //@ts-ignore
           const target = allData[optionItem.value] as FetchYdToolListItemRes;
-          if (!target || !target?.items?.length) return null;
+
           return (
-            <>
-              <div className="flex  px-12 items-center">
-                <span className="font-bold text-[14px] text-[#495464] mr-4">
-                  {target?.nameCN}
-                </span>
-                <div>
-                  <span className="icon iconfont icon-reserved-fill text-[#FF9F69] mr-1"></span>
-                  <span className="text-[#495464] text-[14px]">
-                    共
-                    <span className="text-[#155EEF] mx-1">
-                      {target.provider_num}
-                    </span>
-                    个工具集，合计
-                    <span className="text-[#155EEF] mx-1">
-                      {target.tool_num}
-                    </span>
-                    个工具
+            <div key={index}>
+              {
+                (activeTab === "all" || !!target?.items?.length) && <div className="flex  px-12 items-center my-1">
+                  <span className="font-bold text-base text-[#495464] mr-4">
+                    {target?.nameCN}
                   </span>
+                  <div>
+                    <span className="icon iconfont icon-reserved-fill text-[#FF9F69] mr-1"></span>
+                    <span className="text-[#495464] text-[14px]">
+                      共
+                      <span className="text-[#155EEF] mx-1">
+                        {target?.provider_num}
+                      </span>
+                      个工具集，合计
+                      <span className="text-[#155EEF] mx-1">
+                        {target?.tool_num}
+                      </span>
+                      个工具
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div
-                className={cn(
-                  "relative grid content-start grid-cols-1 gap-4 px-12 pt-2 pb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0",
-                  currentProvider &&
-                  "pr-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                )}
-              >
-                {target.items.map((collection) => (
-                  <ProviderCard
-                    active={currentProvider?.id === collection.id}
-                    onSelect={() => setCurrentProvider(collection)}
-                    key={collection.id}
-                    collection={collection}
-                  />
-                ))}
-              </div>
-            </>
+              }
+              {
+                !!target?.items.length && <div
+                  className={cn(
+                    "relative grid content-start grid-cols-1 gap-4 px-12 pt-2 pb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grow shrink-0",
+                    currentProvider &&
+                    "pr-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                  )}
+                >
+                  {target?.items?.map((collection) => (
+                    <ProviderCard
+                      active={currentProvider?.id === collection.id}
+                      onSelect={() => setCurrentProvider(collection)}
+                      key={collection.id}
+                      //@ts-ignore
+                      collection={collection}
+                      style={{
+                        background: `linear-gradient( 180deg, ${optionItem.color} 0%, #FFFFFF 100%)`,
+                        borderWidth: 0
+                      }}
+                    />
+                  ))}
+                </div>
+              }
+
+            </div>
           );
         })}
-         {/* @ts-ignore */}
+        {/* @ts-ignore */}
         {Object.values(allData)?.every(data => !data?.items?.length) && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Empty />

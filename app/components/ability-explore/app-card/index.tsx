@@ -7,7 +7,6 @@ export type AppCardProps = {
   active?: boolean
 }
 const AppCard = ({ onSelect, collection,active }: AppCardProps) => {
-  console.log(collection)
   return (
     <div
       className={cn(

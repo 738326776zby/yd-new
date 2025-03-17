@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangboya3 zhangboya3@xiaomi.com
+ * @Date: 2025-03-12 10:25:55
+ * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
+ * @LastEditTime: 2025-03-17 22:18:14
+ * @FilePath: /yd-new/app/components/ability-explore/owned-list/card/index.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 'use client'
 import { useContext } from 'use-context-selector'
 import type { Collection } from '@/models/ability-explore'
@@ -40,7 +48,7 @@ const Card = ({
         </div>
         <div className='grow w-0 py-[1px]'>
           <div className='flex items-center text-sm leading-5 font-semibold text-gray-800'>
-            <div className='truncate' title={collection.label[language]}>{collection.label[language]}</div>
+            <div className='truncate' title={collection.name}>{collection.name}</div>
           </div>
         </div>
       </div>
@@ -54,9 +62,9 @@ const Card = ({
           collection.labels?.length ? 'line-clamp-2' : 'line-clamp-4',
           collection.labels?.length > 0 && 'group-hover:line-clamp-2 group-hover:max-h-[36px]',
         )}
-        title={collection.description[language]}
+        title={collection.description}
       >
-        {collection.description[language]}
+        {collection.description}
       </div>
     </div>
   )
