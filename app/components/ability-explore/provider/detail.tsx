@@ -45,7 +45,6 @@ import {
   updateCustomCollection,
 } from "@/service/tools";
 import {
-  fetcHhyydDataProviderList,
   fetcHhyydToolsProviderList,
 } from "@/service/ability-explore";
 import { useModalContext } from "@/context/modal-context";
@@ -230,7 +229,7 @@ const ProviderDetail = ({ collection, onRefreshData, type }: Props) => {
       if (collection.type === CollectionType.builtIn) {
         let list: Tool[] = [];
         if (type === "owned") {
-          list = await fetcHhyydDataProviderList(collection.name);
+          // list = await fetcHhyydDataProviderList(collection.name);
         } else if (type === "defaultTools") {
           list = await fetcHhyydToolsProviderList(collection.name);
         }

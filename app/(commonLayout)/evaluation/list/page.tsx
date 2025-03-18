@@ -32,7 +32,6 @@ const DefaultToolsList = () => {
   const [open, setOpen] = useState(false)
   const [openNew, setOpenNew] = useState(false)
   const router = useRouter()
-  console.log(userInfo)
   const handleKeywordsChange = (value: string) => {
     setKeywords(value)
   }

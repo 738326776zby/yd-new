@@ -197,7 +197,7 @@ const SettingBuiltInTool: FC<Props> = ({
     } else {
       //@ts-ignore
       return <Textarea
-        className="h-[88px] resize-none mt-4"
+        className="h-[44px] resize-none mt-4"
         defaultValue={paramsData[item.name]}
         onChange={(e) => {
           setParamsData({

@@ -19,7 +19,6 @@ const NewEvaluationPrincipleModal = ({
   const [showSelect, setShowSelect] = useState(false);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([])
-
   const NameByUrl = (url: string) => { 
     if (!url) return '';
     // 处理路径分隔符，兼容反斜杠和正斜杠
@@ -43,6 +42,7 @@ const NewEvaluationPrincipleModal = ({
       form?.setFieldsValue(target)
     } else { 
       setFileList([])
+      form?.setFieldsValue({})
     }
   }, [target]);
   const formChange = (

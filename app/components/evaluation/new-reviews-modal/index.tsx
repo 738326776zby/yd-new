@@ -121,7 +121,6 @@ const NewReviewsModal = ({
     }
 
     const uploadHandleChange = ({ fileList }: any) => {
-        console.log(fileList)
         setFileList(fileList);
     }
     const closeModal = () => {
