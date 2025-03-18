@@ -24,9 +24,7 @@ const Page: FC<PageProps> = ({ id }) => {
   const getParams = async () => {
     const res = await fetcHhyydDataProvider(id);
     setIntroduce(res);
-    Object.entries(res?.examples).map((item) => {
-      setCurrentHtml(item[1]);
-    });
+    setCurrentHtml(res?.examples[0]?.content)
   };
   useEffect(() => {
     getParams();
@@ -39,15 +37,12 @@ const Page: FC<PageProps> = ({ id }) => {
     >
       <div
         className="flex bg-white shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] flex-1 rounded-lg p-4 overflow-y-auto"
-       
       >
         { 
           currentHtml ? <div dangerouslySetInnerHTML={{ __html: currentHtml }}></div> : <Skeleton active paragraph={{rows:10}} />
         }
-        
       </div>
       <div className="flex w-[408px] bg-white shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] rounded-lg gap-6 p-4 flex-col overflow-y-auto">
-       
         { 
           introduce ? <>
            <div className="flex  gap-6 items-center">
@@ -71,14 +66,15 @@ const Page: FC<PageProps> = ({ id }) => {
           <div className="text-[14px] font-bold text-[#495464]">示例</div>
           <div className="flex gap-2 flex-col">
             {introduce &&
-              Object.entries(introduce?.examples)?.map(([key, value]) => (
+             introduce?.examples?.map((item) => (
                 <div
                   className="text-[14px] font-bold text-[#495464] bg-[#DEE9FF] rounded-[4px] py-1 px-4 cursor-pointer text-[#155EEF]"
                   onClick={() => {
-                    setCurrentHtml(value);
+                    setCurrentHtml(item.content);
                   }}
+                 key={item.name}
                 >
-                  {key}
+                  {item.name}
                 </div>
               ))}
           </div>

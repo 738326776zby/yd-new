@@ -3,7 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Radio, Upload, Select } from "antd";
 import { UploadOutlined, InfoCircleFilled } from "@ant-design/icons";
 import Toast from '@/app/components/base/toast'
-import { getCollectionsSchemelist, addschemeCollections } from '@/service/evaluation'
+import {
+  addschemeCollections, updateSchemeCollections,
+  fetchEvaluationObjectList
+ } from '@/service/evaluation'
+import EvaluationContext from '@/context/evaluation-context'
+import { useContext } from 'use-context-selector'
+import { EvaluationObjectItem } from '@/models/evaluation'
 type NewEvaluationPrincipleModalProps = {
   setOpen?: () => void;
   open: boolean;
@@ -16,10 +22,12 @@ const NewEvaluationPrincipleModal = ({
   target,
   onCancel
 }: NewEvaluationPrincipleModalProps) => {
+  const { userInfo } = useContext(EvaluationContext)
   const [showSelect, setShowSelect] = useState(false);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([])
-  const NameByUrl = (url: string) => { 
+  const [evaluationObjectList, setEvaluationObjectList] = useState<EvaluationObjectItem[]>([])
+  const NameByUrl = (url: string) => {
     if (!url) return '';
     // 处理路径分隔符，兼容反斜杠和正斜杠
     const normalizedUrl = url.replace(/\\/g, '/');
@@ -29,22 +37,30 @@ const NewEvaluationPrincipleModal = ({
     return fileName.split('?')[0];
   }
   useEffect(() => {
-    if (target?.evaluation_type == "规则评分") {
-      setShowSelect(true)
-    }
-    if (target?.id) {
-      if (target.path) {
-        setFileList([{
-          url: target.path,
-          name: NameByUrl(target.path)
-        }])
+    if (open) {
+      if (target?.evaluation_type == "规则评分") {
+        setShowSelect(true)
       }
-      form?.setFieldsValue(target)
-    } else { 
-      setFileList([])
-      form?.setFieldsValue({})
+      if (target?.id) {
+        if (target.path) {
+          setFileList([{
+            url: target.path,
+            name: NameByUrl(target.path)
+          }])
+        }
+        form?.setFieldsValue(target)
+      }
     }
-  }, [target]);
+  }, [target, open]);
+  const getEvaluationObjectList = async () => {
+    const res = await fetchEvaluationObjectList()
+    if(res.code === 200) {
+      setEvaluationObjectList(res.data)
+    }
+  }
+  useEffect(() => {
+    getEvaluationObjectList()
+  }, [])
   const formChange = (
     changedValues: Record<string, string>,
     allValues: any
@@ -79,6 +95,13 @@ const NewEvaluationPrincipleModal = ({
     return false;
   };
   const opt = () => {
+    if (!fileList.length) {
+      Toast.notify({
+        type: 'error',
+        message: '请上传评测集文件'
+      })
+      return
+    }
     form.validateFields().then(async (values) => {
       try {
         const formData = new FormData();
@@ -91,10 +114,24 @@ const NewEvaluationPrincipleModal = ({
         fileList.forEach(file => {
           formData.append('file', file.originFileObj); // 这里的 'files[]' 是服务器接收文件时的字段名
         });
+        formData.append('user_id', userInfo?.user_id || '')
+        formData.append('user_name', userInfo?.user_name || '')
+        formData.append('tenant_id', userInfo?.tenant_id || '')
+        let res =null
         //@ts-ignore
-        const res = await addschemeCollections(formData)
-
-        if (res.code === 200) {
+        if (!target?.id) {
+          //@ts-ignore
+          res = await addschemeCollections(formData)
+        } else { 
+          res = await updateSchemeCollections({
+            id: target.id,
+            tenant_id: target.tenant_id,
+            name: values.name,
+            instructions: values.instructions,
+            introduction: values.introduction,
+          })
+        }
+        if (res?.code === 200) {
           Toast.notify({
             type: 'success',
             message: `${target?.id ? '更新' : '创建'}评测方案成功`
@@ -118,7 +155,13 @@ const NewEvaluationPrincipleModal = ({
   const closeModal = () => {
     onCancel && onCancel();
     setFileList([])
-    form.resetFields()
+    form?.setFieldsValue({
+      name: '',
+      instructions: '',
+      introduction: '',
+      evaluation_type: '',
+      evaluation_content: ''
+    })
   };
   return (
     <Modal
@@ -147,12 +190,12 @@ const NewEvaluationPrincipleModal = ({
         onValuesChange={formChange}
         form={form}
         colon={false}
-      
+
       >
         <Form.Item
           label="文件上传"
         >
-          <Upload accept=".xls,.xlsx,.csv" beforeUpload={beforeUpload} onChange={uploadHandleChange} fileList={fileList} maxCount={1}>
+          <Upload accept=".xls,.xlsx,.csv" beforeUpload={beforeUpload} onChange={uploadHandleChange} fileList={fileList} maxCount={1} disabled={target?.id}>
             {
               !target?.id && <>
                 <Button icon={<UploadOutlined />} type="primary" shape="round" size="small">文件上传</Button>
@@ -167,7 +210,7 @@ const NewEvaluationPrincipleModal = ({
           </Upload>
         </Form.Item>
         <Form.Item label="评测集名称" name="name" rules={[{ required: true, message: '评测集名称为必填项' }]}   >
-          <Input disabled={target?.id}/>
+          <Input disabled={target?.id} />
         </Form.Item>
         <Form.Item label="适用说明" name="instructions" rules={[{ required: true, message: '适用说明为必填项' }]}>
           <Input.TextArea />
@@ -176,7 +219,7 @@ const NewEvaluationPrincipleModal = ({
           <Input.TextArea />
         </Form.Item>
         <Form.Item label="评测方法" name="evaluation_type" rules={[{ required: true, message: '评测方法为必填项' }]}>
-          <Radio.Group>
+          <Radio.Group disabled={target?.id}>
             <Radio value="大模型评分"> 大模型评分 </Radio>
             <Radio value="规则评分"> 规则评分 </Radio>
             <Radio value="调用外部评分模型"> 调用外部评分模型 </Radio>
@@ -185,15 +228,14 @@ const NewEvaluationPrincipleModal = ({
         <Form.Item label=" " name="evaluation_content" >
           {showSelect ? (
             <Select
-              options={[
-                { value: "1", label: "Jack" },
-                { value: "2", label: "Lucy" },
-                { value: "3", label: "Tom" },
-              ]}
+              options={evaluationObjectList}
+              fieldNames={{
+                label: 'title',
+              }}
               disabled={target?.id}
             />
           ) : (
-            <Input.TextArea   disabled={target?.id}/>
+            <Input.TextArea disabled={target?.id} />
           )}
         </Form.Item>
       </Form>

@@ -5,13 +5,14 @@ import { useTranslation } from "react-i18next";
 import { useContext } from "use-context-selector";
 import cn from "@/utils/classnames";
 import Drawer from "@/app/components/base/drawer-plus";
-import Input from '@/app/components/base/input'
+// import Input from '@/app/components/base/input'
 import Form from "@/app/components/header/account-setting/model-provider-page/model-modal/Form";
 import {
   addDefaultValue,
   toolParametersToFormSchemas,
 } from "@/app/components/tools/utils/to-form-schema";
-import Textarea from "@/app/components/base/textarea";
+import { Input,Select } from 'antd'
+// import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
 import {
@@ -20,14 +21,14 @@ import {
   fetchWorkflowToolList,
   fetchBuiltInToolList
 } from "@/service/tools";
-import { fetcHhyydDataProviderList, fetchTestTool,fetcHhyydToolsProviderList } from '@/service/ability-explore'
+import {fetchTestTool,fetcHhyydToolsProviderList } from '@/service/ability-explore'
 import I18n from "@/context/i18n";
 import Button from "@/app/components/base/button";
 import Loading from "@/app/components/base/loading";
 import { DiagonalDividingLine } from "@/app/components/base/icons/src/public/common";
 import { getLanguage } from "@/i18n/language";
 import AppIcon from "@/app/components/base/app-icon";
-import Select from "@/app/components/base/select";
+// import Select from "@/app/components/base/select";
 import {
   useSearchParams,
 } from 'next/navigation'
@@ -42,7 +43,7 @@ type Props = {
   onHide: () => void;
   onSave?: (value: Record<string, any>) => void;
 };
-
+const { TextArea } = Input;
 const SettingBuiltInTool: FC<Props> = ({
   collection,
   isBuiltIn = true,
@@ -85,7 +86,6 @@ const SettingBuiltInTool: FC<Props> = ({
               if (type === "defaultTools") {
                 resolve(await fetcHhyydToolsProviderList(collection.name));
               } else if (type === 'owned') {
-                resolve(await fetcHhyydDataProviderList(collection.name));
               } else { 
                 resolve(await fetchBuiltInToolList(collection.name))
               }
@@ -149,56 +149,61 @@ const SettingBuiltInTool: FC<Props> = ({
     if (type === "number") {
       return <Input
         className="resize-none mt-4"
-        defaultValue={paramsData[item.name]}
+        value={paramsData[item.name]}
         placeholder="请输入"
+        variant="filled"
         type="number"
-        onChange={(e) => {
+        onChange={(v) => {
           setParamsData({
             ...paramsData,
-            [item.name]: e.target.value,
+            [item.name]: v,
           });
         }}
       />
     } else if (type === 'boolean') {
       return <Select
-        className="resize-none mt-4"
-        defaultValue={paramsData[item.name]}
-        items={[
+        className="resize-none mt-4 w-full"
+        value={paramsData[item.name]}
+        options={[
           {
             //@ts-ignore
             value: true,
-            name: "是",
+            label: "是",
           },
           {
             //@ts-ignore
             value: false,
-            name: "否",
+            label: "否",
           },
         ]}
-        onSelect={(e) => {
+         variant="filled"
+        onChange={(value) => {
           setParamsData({
             ...paramsData,
-            [item.name]: e.value,
+            [item.name]:value,
           });
         }}
       />
     } else if (type === 'select') {
       return <Select
-        className="resize-none mt-4"
-        defaultValue={paramsData[item.name]}
-        onSelect={(e) => {
+        className="resize-none mt-4 w-full"
+        variant="filled"
+        value={paramsData[item.name]}
+        onChange={(e) => {
           setParamsData({
             ...paramsData,
-            [item.name]: e.value,
+            [item.name]: e,
           });
         }}
-        items={(item.options || []).map((i: any) => ({ name: i.value, value: i.value }))}
+        options={(item.options || []).map((i: any) => ({ label: i.value, value: i.value }))}
       />
     } else {
       //@ts-ignore
-      return <Textarea
-        className="h-[44px] resize-none mt-4"
-        defaultValue={paramsData[item.name]}
+      return <TextArea
+        className=" resize-none mt-4"
+        autoSize
+        variant="filled"
+        value={paramsData[item.name]}
         onChange={(e) => {
           setParamsData({
             ...paramsData,
@@ -277,12 +282,11 @@ const SettingBuiltInTool: FC<Props> = ({
             </Button>
           </div>
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
-          <Textarea
-            className="h-[150px] resize-none mt-4"
-            value={output}
-            disabled={true}
-            placeholder="请输入"
-          />
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <pre className="whitespace-pre-wrap break-words text-sm text-gray-600 font-mono">
+              {output ? JSON.stringify(JSON.parse(output), null, 2) : "暂无输出"}
+            </pre>
+          </div>
         </div>
       )}
     </div>

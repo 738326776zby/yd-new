@@ -10,13 +10,17 @@ import { Checkbox, Table } from 'antd';
 import AppIcon from '@/app/components/base/app-icon'
 import Input from '@/app/components/base/input'
 import { CheckCircleFilled, CloseCircleFilled, LoadingOutlined } from '@ant-design/icons'
-import { BaseResponse, EvaluationRecord, RecordTableListItem, PageinfoProps, GetRecordlistReq } from '@/models/evaluation'
-import test from '../list/test.json'
-import { getRecordlist,downloadReviews,downloadCollections } from '@/service/evaluation'
+import { BaseResponse, EvaluationRecord, RecordTableListItem, PageinfoProps, GetRecordlistReq,EvaluationObjectItem } from '@/models/evaluation'
+import { getRecordlist, downloadReviews, downloadCollections, getCollectionsSchemelist } from '@/service/evaluation'
+import EvaluationContext from '@/context/evaluation-context'
+import { useContext } from 'use-context-selector'
 import testTableData from './test.json'
 import NewReviewsModal from '@/app/components/evaluation/new-reviews-modal'
+import { sourceMap } from '../list/page'
+import dayjs from 'dayjs'
 const AppList = () => {
   const searchParams = useSearchParams()
+  const { userInfo } = useContext(EvaluationContext)
   const tenant_id = searchParams.get('tenant_id') || ''
   const collections_id = searchParams.get('collections_id') || ''
   const columns = [
@@ -90,27 +94,29 @@ const AppList = () => {
   const [tableParams, setTableParams] = useState<GetRecordlistReq>({
     tenant_id,
     collections_id,
-    user_id: '',
+    user_id: userInfo?.user_id || '',
     pageNum: 1,
     pageSize: 10,
-    evaluation_object: ""
-  })
- 
+    evaluation_object: "",
+    filter_curr_user: false,
+    evaluation_time_order: "DESC",
+    results_order: "DESC",
+  });
+  
   const getDetailsList = async () => {
-    // const res = await getCollectionsSchemelist()
-    const res = test as BaseResponse<{ list: EvaluationRecord[] }>
+    const res = await getCollectionsSchemelist(tenant_id||'',userInfo?.user_id ||'')
     if (res.code === 200) {
       const _detail = res.data?.list.filter(item => item.id === collections_id)
       setDetaills(_detail?.[0] || undefined)
     }
   }
   const getTableList = async (params: GetRecordlistReq) => {
-    // const res = await getRecordlist({
-    //   ...tableParams,
-    //   ...params
-    // })
+    const res = await getRecordlist({
+      ...tableParams,
+      user_id: userInfo?.user_id || '',
+      ...params
+    })
     // @ts-ignore
-    const res = testTableData as BaseResponse<PageinfoProps<EvaluationRecord[]>>
     if (res.code === 200) {
       //@ts-ignore
       setTableData(res.data.list)
@@ -123,30 +129,28 @@ const AppList = () => {
     }
   }
   useEffect(() => {
-    getDetailsList()
-    getTableList({})
-  }, [])
+    if (userInfo) {
+      getDetailsList()
+      getTableList({})
+    }
+  }, [userInfo])
   const downloadCollection = async (e:React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
     if (details) { 
-      downloadCollections(details?.id,details?.tenant_id)
+      downloadCollections(details?.id)
     }
   };
-  
   return (
-    <div className='relative flex justify-center overflow-y-auto bg-background-body shrink-0 h-0 grow  gap-4 p-6'>
+    <div className='relative flex justify-center overflow-y-auto bg-background-body shrink-0  grow  gap-4 p-6'>
       <div className='w-[336px] bg-white flex flex-col shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] rounded-lg border border-[#E1E3E7]'>
         <div className='flex  pt-[14px] px-[14px] pb-4 border-b border-dashed border-[#E1E3E7] '>
-          <div className='relative w-10 h-10'>
-
-          </div>
           <div className='grow  py-[1px] flex-1'>
             <div className='flex items-center text-sm leading-5 font-semibold text-gray-800 justify-between'>
               <div className='truncate' title={details?.name}>{details?.name}</div>
               <Button type="link" icon={<DownloadOutlined />} className='text-[12px]' onClick={downloadCollection}>下载</Button>
             </div>
             <div className='flex items-center text-[10px] leading-[18px] text-gray-500 font-medium'>
-              <div className='truncate'>发布于&nbsp;{details?.created_time}</div>
+              <div className='truncate'>发布于&nbsp;{dayjs(details?.created_time).format('YYYY-MM-DD')}</div>
             </div>
           </div>
         </div>
@@ -157,7 +161,7 @@ const AppList = () => {
               来源
             </div>
             <div>
-              {details?.source}
+              {sourceMap[details?.source||0]}
             </div>
           </div>
           <div className='flex flex-col flex-1 gap-1 text-[#667085] text-[14px]'>
@@ -192,9 +196,9 @@ const AppList = () => {
       <div className='flex-1 bg-white flex flex-col border-r-3  shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] rounded-lg border border-[#E1E3E7]'>
         <div className='flex items-center justify-between p-4'>
           <div>
-            <Checkbox value={!!tableParams.user_id} onChange={(e) => {
+            <Checkbox value={!!tableParams.filter_curr_user} onChange={(e) => {
               getTableList({
-                user_id: e.target.checked ? window.localStorage.getItem('userId')||'' : ''
+                filter_curr_user: e.target.checked
               })
             }}>只看我的评测记录</Checkbox>
           </div>

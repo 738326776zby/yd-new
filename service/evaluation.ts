@@ -2,67 +2,83 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-15 10:43:54
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-18 01:47:49
+ * @LastEditTime: 2025-03-18 20:20:35
  * @FilePath: /yd-new/service/evaluation.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEU
  */
-import { get, post } from './base'
-import { BaseResponse, EvaluationRecord, CollectionsAddschemeRes, CollectionsDeletescheme, GetRecordlistReq, PageinfoProps, RecordTableListItem,UserInfo } from '@/models/evaluation'
-export const getCollectionsSchemelist = (tenant_id:string,user_id:string) => {
-    return get<BaseResponse<{ list: EvaluationRecord[] }>>('/api/v1/evaluate/collections/schemelist', {
-        type:'evaluation',
-        params:{
-            tenant_id,
-            user_id
-        }
-    })
-}
-export const addschemeCollections = (body: CollectionsAddschemeRes) => {
-    return post<BaseResponse<null>>('/api/v1/evaluate/collections/addscheme', { body }, { bodyStringify: false, deleteContentType: true })
-}
-export const deleteschemeCollections = (body: CollectionsDeletescheme) => {
-    return post<BaseResponse<null>>('/api/v1/evaluate/collections/deletescheme', { body })
-}
-export const getRecordlist = (body: GetRecordlistReq) => {
-    return post<BaseResponse<PageinfoProps<RecordTableListItem[]>>>('/api/v1/evaluate/collections/recordlist', {
-        body
-    })
-}
-export const getEvaluationObjectList = () => {
-    return get<BaseResponse<string[]>>('/api/v1/evaluate/record/evaluationObjectList')
-}
-const downloadCommon = async (response: any) => {
-    // 从响应头中获取文件名
-    const disposition = response.headers['content-disposition'];
-    let filename = '默认名称'; // 设置一个默认文件名
-
-    if (disposition && disposition.indexOf('attachment') !== -1) {
-      const regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/; // 正则表达式
-      const matches = regex.exec(disposition);
-      if (matches != null && matches[1]) {
-        filename = matches[1].replace(/['"]/g, ''); // 去掉引号
-      }
+import { get, post } from "./base";
+import {
+  BaseResponse,
+  EvaluationRecord,
+  CollectionsAddschemeRes,
+  GetRecordlistReq,
+  PageinfoProps,
+  RecordTableListItem,
+  UserInfo,
+  EvaluationObjectItem
+} from "@/models/evaluation";
+export const getCollectionsSchemelist = (
+  tenant_id: string,
+  user_id: string
+) => {
+  return get<BaseResponse<{ list: EvaluationRecord[] }>>(
+    "/api/v1/evaluate/collections/schemelist",
+    {
+      type: "evaluation",
+      params: {
+        tenant_id,
+        user_id,
+      },
     }
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', filename);
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-}
-export const downloadReviews = async (id: string,tenant_id:string) => {
-    const response = await fetch(`/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`);
-    downloadCommon(response)
+  );
+};
+export const addschemeCollections = (body: CollectionsAddschemeRes) => {
+  return post<BaseResponse<null>>(
+    "/api/v1/evaluate/collections/addscheme",
+    { body, type: "evaluation" },
+    { bodyStringify: false, deleteContentType: true }
+  );
+};
+export const updateSchemeCollections = (body: CollectionsAddschemeRes) => {
+  return post<BaseResponse<null>>(
+    "/api/v1/evaluate/collections/updatescheme",
+    { body, type: "evaluation" },
+  );
+};
+export const deleteschemeCollections = (id:string) => {
+  return get<BaseResponse<null>>(`/api/v1/evaluate/collections/deletescheme?&id=${id}`, {
+      type: "evaluation"
+  });
+};
+export const getRecordlist = (body: GetRecordlistReq) => {
+  return post<BaseResponse<PageinfoProps<RecordTableListItem[]>>>(
+    "/api/v1/evaluate/collections/recordlist",
+    {
+      body,
+      type: "evaluation"
+    }
+  );
+};
+export const getEvaluationObjectList = () => {
+  return get<BaseResponse<string[]>>(
+    "/api/v1/evaluate/record/evaluationObjectList"
+  );
+};
 
-}
-export const downloadCollections = async (id: string, tenant_id: string) => {
-    const response = await fetch(`/api/v1/evaluate/collections/download?id=${id}&tenant_id=${tenant_id}`);
-    downloadCommon(response)
-
-}
+export const downloadReviews = async (id: string, tenant_id: string) => {
+  window.open(`${process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX}/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`)
+};
+export const downloadCollections = async (id: string) => {
+  window.open(`${process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX}/api/v1/evaluate/collections/download?id=${id}`)
+};
 export const fetchUserInfo = () => {
-    return get<UserInfo>('/hyyd/user/info')
+  return get<UserInfo>("/hyyd/user/info");
+};
+
+export const fetchEvaluationObjectList = () => {
+  return get<BaseResponse<EvaluationObjectItem[]>>("/api/v1/evaluate/record/evaluationRuleList", {
+   type: "evaluation"
+  })
 }
+
+

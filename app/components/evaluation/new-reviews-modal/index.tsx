@@ -35,7 +35,7 @@ const NewReviewsModal = ({
         }
     }
     useEffect(() => {
-        getObjectList()
+        // getObjectList()
     }, [])
     useEffect(() => {
         if (details?.evaluation_type == "规则评分") {

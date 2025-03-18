@@ -8,8 +8,6 @@ import cn from '@/utils/classnames'
 import type { EvaluationRecord } from '@/models/evaluation'
 import Input from '@/app/components/base/input'
 import s from '@/app/(commonLayout)/apps/style.module.css'
-import test from './test.json'
-import AppIcon from '@/app/components/base/app-icon'
 import { Button } from 'antd'
 import { QuestionCircleFilled, DashOutlined } from '@ant-design/icons';
 import EvaluationPrincipleModal from '@/app/components/evaluation/evaluation-principle';
@@ -20,7 +18,8 @@ import { getCollectionsSchemelist,deleteschemeCollections,downloadCollections } 
 import Toast from '@/app/components/base/toast'
 import EvaluationContext from '@/context/evaluation-context'
 import { useContext } from 'use-context-selector'
-const sourceMap = {
+import dayjs from 'dayjs'
+export const sourceMap: { [key: number]: string } = {
   0: '本地上传',
   1: '平台预置'
 }
@@ -52,10 +51,7 @@ const DefaultToolsList = () => {
     const onClickDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation()
       e.preventDefault()
-      const res = await deleteschemeCollections({
-        id: target.id,
-        tenant_id: target.tenant_id
-      })
+      const res = await deleteschemeCollections(target.id)
       if (res.code === 200) {
         Toast.notify({
           type: 'success',
@@ -71,8 +67,7 @@ const DefaultToolsList = () => {
     }
     const downloadBlob = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
-      downloadCollections(target.id, target.tenant_id)
-    
+      downloadCollections(target.id)
     };
     
     return (
@@ -160,7 +155,9 @@ const DefaultToolsList = () => {
           <div className='flex flex-col col-span-1 bg-gray-200 border-[0.5px] border-black/5 rounded-xl min-h-[160px] transition-all duration-200 ease-in-out cursor-pointer hover:bg-gray-50 hover:shadow-lg' onClick={() => {
             setOpenNew(true)
 
-          }} >
+          }}  onMouseEnter={() => {
+            setChooseTarget(undefined)
+          }}>
             <div className='group grow rounded-t-xl hover:bg-white' >
               <div className='shrink-0 flex items-center p-4 pb-3'>
                 <div className='w-10 h-10 flex items-center justify-center border border-gray-200 bg-gray-100 rounded-lg group-hover:border-primary-100 group-hover:bg-primary-50'>
@@ -185,22 +182,12 @@ const DefaultToolsList = () => {
               className='relative h-[160px] group col-span-1 bg-components-card-bg border-[1px] border-solid border-components-card-border rounded-xl shadow-sm inline-flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg flex'
             >
               <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
-                <div className='relative shrink-0'>
-                  {/* <AppIcon
-                    size="large"
-                    iconType={collection?.icon_type}
-                    icon={collection?.icon}
-                    background={collection?.icon_background}
-                    imageUrl={collection.icon_url}
-                  />
-                  <AppTypeIcon type={collection.mode} wrapperClassName='absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-sm' className='w-3 h-3' /> */}
-                </div>
                 <div className='grow w-0 py-[1px]'>
                   <div className='flex items-center text-sm leading-5 font-semibold text-text-secondary'>
                     <div className='truncate' title={collection.name}>{collection.name}</div>
                   </div>
                   <div className='flex items-center text-[10px] leading-[18px] text-text-tertiary font-medium'>
-                    发布于{collection.created_time}
+                    发布于{dayjs(collection.created_time).format('YYYY-MM-DD')}
                   </div>
                 </div>
               </div>

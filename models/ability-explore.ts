@@ -202,6 +202,14 @@ export type FetchYdToolListReq = {
   label?: string[]
   keyword?: string
 }
+export type fetchYdToolListResItem = {
+  items: Collection[]
+  provider_num: number
+  tool_num: number
+  nameCN: string
+  color: string
+  id: string
+}
 export type FetchYdToolListItemRes = {
   items: Collection[]
   provider_num: number
@@ -222,8 +230,9 @@ export type FetchYdToolListRes = {
 export type HyydDataProviderReq = {
   full_description: string
   examples: {
-    [key: string]: string
-  }
+    name: string
+    content: string
+  }[]
   icon: string
   name:string
 }
