@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangboya3 zhangboya3@xiaomi.com
+ * @Date: 2024-12-30 10:43:41
+ * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
+ * @LastEditTime: 2025-03-18 11:20:33
+ * @FilePath: /yd-new/app/components/app/configuration/config-prompt/message-type-selector.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 'use client'
 import type { FC } from 'react'
 import React from 'react'
@@ -10,7 +18,7 @@ type Props = {
   onChange: (value: PromptRole) => void
 }
 
-const allTypes = [PromptRole.system, PromptRole., PromptRole.assistant]
+const allTypes = [PromptRole.system, PromptRole.user, PromptRole.assistant]
 const MessageTypeSelector: FC<Props> = ({
   value,
   onChange,
