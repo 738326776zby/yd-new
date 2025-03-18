@@ -5,7 +5,7 @@ import Page from '@/app/components/ability-explore/owned-page'
 
 export type IInstalledAppProps = {
   params: {
-    appId: string
+    id: string
   }
 }
 

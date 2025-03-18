@@ -1,9 +1,18 @@
+/*
+ * @Author: zhangboya3 zhangboya3@xiaomi.com
+ * @Date: 2025-03-17 22:40:18
+ * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
+ * @LastEditTime: 2025-03-18 13:50:17
+ * @FilePath: /yd-new/app/components/ability-explore/owned-page/index.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import type { FC } from "react";
 import React, { useEffect, useState } from "react";
 import { fetcHhyydDataProvider } from "@/service/ability-explore";
 import cn from "classnames";
 import Introduce from "@/app/components/ability-explore/introduce";
 import { HyydDataProviderReq } from "@/models/ability-explore";
+import { Skeleton } from "antd";
 
 export type PageProps = {
   id: string;
@@ -25,15 +34,23 @@ const Page: FC<PageProps> = ({ id }) => {
   return (
     <div
       className={cn(
-        "flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow gap-4 mt-6 ml-4"
+        "flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow gap-4 pt-6 ml-4"
       )}
     >
       <div
         className="flex bg-white shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] flex-1 rounded-lg p-4 overflow-y-auto"
-        dangerouslySetInnerHTML={{ __html: currentHtml }}
-      ></div>
+       
+      >
+        { 
+          currentHtml ? <div dangerouslySetInnerHTML={{ __html: currentHtml }}></div> : <Skeleton active paragraph={{rows:10}} />
+        }
+        
+      </div>
       <div className="flex w-[408px] bg-white shadow-[0px_8px_16px_0px_rgba(217,219,232,0.51)] rounded-lg gap-6 p-4 flex-col overflow-y-auto">
-        <div className="flex  gap-6 items-center">
+       
+        { 
+          introduce ? <>
+           <div className="flex  gap-6 items-center">
           {typeof introduce?.icon === "string" && (
             <div
               className="w-14 h-14 bg-center bg-cover bg-no-repeat rounded-md"
@@ -65,7 +82,9 @@ const Page: FC<PageProps> = ({ id }) => {
                 </div>
               ))}
           </div>
-        </div>
+        </div></>:<Skeleton active paragraph={{rows:10}} avatar/>
+        }
+       
       </div>
     </div>
   );
