@@ -153,10 +153,10 @@ const SettingBuiltInTool: FC<Props> = ({
         placeholder="请输入"
         variant="filled"
         type="number"
-        onChange={(v) => {
+        onChange={(e) => {
           setParamsData({
             ...paramsData,
-            [item.name]: v,
+            [item.name]: e.target.value,
           });
         }}
       />
@@ -237,6 +237,7 @@ const SettingBuiltInTool: FC<Props> = ({
                   className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]"
                   onClick={() => {
                     setParamsData(exampleItem);
+                    setOutput('')
                   }}
                 >
                   示例{index + 1}
@@ -282,7 +283,7 @@ const SettingBuiltInTool: FC<Props> = ({
             </Button>
           </div>
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
             <pre className="whitespace-pre-wrap break-words text-sm text-gray-600 font-mono">
               {output ? JSON.stringify(JSON.parse(output), null, 2) : "暂无输出"}
             </pre>

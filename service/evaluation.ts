@@ -2,7 +2,7 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-15 10:43:54
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-18 20:20:35
+ * @LastEditTime: 2025-03-18 23:08:47
  * @FilePath: /yd-new/service/evaluation.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEU
  */
@@ -60,9 +60,9 @@ export const getRecordlist = (body: GetRecordlistReq) => {
   );
 };
 export const getEvaluationObjectList = () => {
-  return get<BaseResponse<string[]>>(
-    "/api/v1/evaluate/record/evaluationObjectList"
-  );
+  return get<BaseResponse<{ [key: string]: string }>>("/api/v1/evaluate/record/evaluationObjectList", {
+    type: "evaluation"
+  });
 };
 
 export const downloadReviews = async (id: string, tenant_id: string) => {

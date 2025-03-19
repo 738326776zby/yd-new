@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Radio, Upload, Select } from "antd";
 import { UploadOutlined, InfoCircleFilled } from "@ant-design/icons";
 import Toast from '@/app/components/base/toast'
-import { getCollectionsSchemelist, addschemeCollections, getEvaluationObjectList } from '@/service/evaluation'
-import { EvaluationRecord } from '@/models/evaluation'
+import { getCollectionsSchemelist, addschemeCollections, getEvaluationObjectList,fetchEvaluationObjectList } from '@/service/evaluation'
+import { EvaluationRecord,EvaluationObjectItem } from '@/models/evaluation'
 type NewEvaluationPrincipleModalProps = {
     open: boolean;
     details: EvaluationRecord | undefined// 这里之后需要改一下
@@ -18,7 +18,8 @@ const NewReviewsModal = ({
     const [showSelect, setShowSelect] = useState(false);
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState<any[]>([])
-    const [objectList, setObjectList] = useState<string[]>([])
+    const [objectList, setObjectList] = useState<{ value: string, label: string }[]>([])
+    const [evaluationObjectList, setEvaluationObjectList] = useState<EvaluationObjectItem[]>([])
     const NameByUrl = (url: string) => {
         if (!url) return '';
         // 处理路径分隔符，兼容反斜杠和正斜杠
@@ -31,11 +32,24 @@ const NewReviewsModal = ({
     const getObjectList = async () => {
         const res = await getEvaluationObjectList()
         if (res.code === 200) {
-            setObjectList(res.data)
+            const list = Object.entries(res.data).map((item) => { 
+                return {
+                    value:item[1],
+                    label:item[0]
+                }
+            })
+            setObjectList(list)
         }
     }
+    const getRecordEvaluationObjectList = async () => {
+        const res = await fetchEvaluationObjectList()
+        if(res.code === 200) {
+          setEvaluationObjectList(res.data)
+        }
+      }
     useEffect(() => {
-        // getObjectList()
+        getObjectList()
+        getRecordEvaluationObjectList()
     }, [])
     useEffect(() => {
         if (details?.evaluation_type == "规则评分") {
@@ -192,11 +206,7 @@ const NewReviewsModal = ({
                 <Form.Item label=" " name="evaluation_content" >
                     {showSelect ? (
                         <Select
-                            options={[
-                                { value: "1", label: "Jack" },
-                                { value: "2", label: "Lucy" },
-                                { value: "3", label: "Tom" },
-                            ]}
+                            options={evaluationObjectList}
                             disabled
                         />
                     ) : (
@@ -207,12 +217,12 @@ const NewReviewsModal = ({
                     <div className="w-[25px] h-[25px] bg-[#155EEF] rounded-full mr-2 text-white flex items-center justify-center">2</div>
                     <div className=" text-[#495464] font-bold">选择评测对象</div>
                 </div>
-                <Form.Item label="评测对象" name="evaluation_content" rules={[{ required: true, message: '评测对象为必填项' }]}>
+                <Form.Item label="评测对象" name="evaluation_object" rules={[{ required: true, message: '评测对象为必填项' }]}>
                     <Select
-                        options={objectList.map(item => ({ value: item, label: item }))}
+                        options={objectList}
                     />
                 </Form.Item>
-                <Form.Item label="本次评测说明" name="evaluation_content" rules={[{ required: true, message: '本次评测说明为必填项' }]}>
+                <Form.Item label="本次评测说明" name="task_description" rules={[{ required: true, message: '本次评测说明为必填项' }]}>
                     <Input.TextArea placeholder="请输入评测次数，以及评测点或者原因，如“第2次评测，节点中新增意图识别，并引入本地知识库”" rows={4} />
                 </Form.Item>
             </Form>
