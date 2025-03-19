@@ -24,10 +24,9 @@ const List = ({ className }: {className:string}) => {
     const [collectionList, setCollectionList] = useState<Collection[]>([]);
     const filteredCollectionList = useMemo(() => {
         return collectionList.filter((collection) => {
-            if (keywords)
-                return Object.values(collection.label).some((value) =>
-                    value.toLowerCase().includes(keywords.toLowerCase())
-                );
+            if (keywords) {
+                return collection.name.toLowerCase().includes(keywords.toLowerCase())
+            }
             return true;
         });
     }, [keywords, collectionList]);

@@ -125,7 +125,8 @@ const List = ({ className }: ListProps) => {
                   <span className="font-bold text-base text-[#495464] mr-4">
                     {optionItem?.nameCN}
                   </span>
-                  <div>
+                  { 
+                    !optionItem?.items.length ?<div className="text-[#495464] text-[14px]">相关工具研发中，将陆续推出，敬请期待。</div>:  <div>
                     <span className="icon iconfont icon-reserved-fill text-[#FF9F69] mr-1"></span>
                     <span className="text-[#495464] text-[14px]">
                       共
@@ -139,6 +140,7 @@ const List = ({ className }: ListProps) => {
                       个工具
                     </span>
                   </div>
+                  }
                 </div>
               }
               {

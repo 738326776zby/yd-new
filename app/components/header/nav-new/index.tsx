@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSelectedLayoutSegment } from 'next/navigation'
 import type { INavSelectorProps } from './nav-selector'
@@ -18,6 +18,8 @@ type INavProps = {
   activeSegment: string | string[]
   link: string
   navs: EvaluationRecord[]
+  curNav: EvaluationRecord | null
+  setCurNav: (nav: EvaluationRecord) => void
 } & INavSelectorProps
 
 const Nav = ({
@@ -27,13 +29,13 @@ const Nav = ({
   activeSegment,
   link,
   navs,
+  curNav,setCurNav
 }: INavProps) => {
   const setAppDetail = useAppStore(state => state.setAppDetail)
- 
   const [hovered, setHovered] = useState(false)
   const segment = useSelectedLayoutSegment()
   const isActivated = Array.isArray(activeSegment) ? activeSegment.includes(segment!) : segment === activeSegment
- 
+  const router = useRouter()
   const pathname = usePathname()
   const showNav = pathname.includes('/evaluation/manage')
   return (
@@ -52,13 +54,16 @@ const Nav = ({
           onMouseLeave={() => setHovered(false)}
         >
           <div className='mr-2'>
-            {/* {
+            {
               (hovered && curNav)
-                ? <ArrowNarrowLeft className='w-4 h-4' />
+                ? <ArrowNarrowLeft className='w-4 h-4' onClick={(e)=>{
+                  e.preventDefault()
+                  router.push(`/evaluation/list`)
+                }}/>
                 : isActivated
                   ? activeIcon
                   : icon
-            } */}
+            }
           </div>
           {text}
         </div>
@@ -69,6 +74,8 @@ const Nav = ({
             <div className='font-light text-gray-300 '>/</div>
             <NavSelector
               navs={navs}
+              curNav={curNav}
+              setCurNav={setCurNav}
             />
           </>
         )

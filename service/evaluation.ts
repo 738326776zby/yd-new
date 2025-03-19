@@ -2,7 +2,7 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-15 10:43:54
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-18 23:08:47
+ * @LastEditTime: 2025-03-19 15:51:48
  * @FilePath: /yd-new/service/evaluation.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AEU
  */
@@ -78,6 +78,20 @@ export const fetchUserInfo = () => {
 export const fetchEvaluationObjectList = () => {
   return get<BaseResponse<EvaluationObjectItem[]>>("/api/v1/evaluate/record/evaluationRuleList", {
    type: "evaluation"
+  })
+}
+export const fetchRecordStart = (body:any) => {
+  return post<BaseResponse<EvaluationRecord>>(`/api/v1/evaluate/record/start`, {
+    type: "evaluation",
+    body
+  })
+}
+export const fetchRestartStart = (id:string) => {
+  return post<BaseResponse<null>>(`/api/v1/evaluate/record/restart`, {
+    type: "evaluation",
+    body: {
+      id
+    }
   })
 }
 

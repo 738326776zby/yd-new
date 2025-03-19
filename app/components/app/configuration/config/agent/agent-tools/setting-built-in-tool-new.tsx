@@ -11,7 +11,7 @@ import {
   addDefaultValue,
   toolParametersToFormSchemas,
 } from "@/app/components/tools/utils/to-form-schema";
-import { Input,Select } from 'antd'
+import { Input, Select } from 'antd'
 // import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
@@ -21,7 +21,7 @@ import {
   fetchWorkflowToolList,
   fetchBuiltInToolList
 } from "@/service/tools";
-import {fetchTestTool,fetcHhyydToolsProviderList } from '@/service/ability-explore'
+import { fetchTestTool, fetcHhyydToolsProviderList } from '@/service/ability-explore'
 import I18n from "@/context/i18n";
 import Button from "@/app/components/base/button";
 import Loading from "@/app/components/base/loading";
@@ -57,7 +57,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const { locale } = useContext(I18n);
   const language = getLanguage(locale);
   const { t } = useTranslation();
-  const [output,setOutput] = useState('')
+  const [output, setOutput] = useState('')
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState<Tool[]>([]);
   const currTool = tools.find((tool) => tool.name === toolName);
@@ -86,10 +86,10 @@ const SettingBuiltInTool: FC<Props> = ({
               if (type === "defaultTools") {
                 resolve(await fetcHhyydToolsProviderList(collection.name));
               } else if (type === 'owned') {
-              } else { 
+              } else {
                 resolve(await fetchBuiltInToolList(collection.name))
               }
-             
+
             else if (collection.type === CollectionType.workflow)
               resolve(await fetchWorkflowToolList(collection.id));
             else resolve(await fetchCustomToolList(collection.name));
@@ -176,11 +176,11 @@ const SettingBuiltInTool: FC<Props> = ({
             label: "否",
           },
         ]}
-         variant="filled"
+        variant="filled"
         onChange={(value) => {
           setParamsData({
             ...paramsData,
-            [item.name]:value,
+            [item.name]: value,
           });
         }}
       />
@@ -284,9 +284,19 @@ const SettingBuiltInTool: FC<Props> = ({
           </div>
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
           <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
-            <pre className="whitespace-pre-wrap break-words text-sm text-gray-600 font-mono">
-              {output ? JSON.stringify(JSON.parse(output), null, 2) : "暂无输出"}
-            </pre>
+            {/* {(() => {
+              try {
+                JSON.parse(output);
+                if (output?.data) {
+                  return <pre className="whitespace-pre-wrap break-words text-sm text-gray-600 font-mono">
+                    JSON.stringify(JSON.parse(output.data), null, 2)
+                  </pre>
+                }
+              } catch (e) {
+                return output;
+              }
+            })()} */}
+
           </div>
         </div>
       )}

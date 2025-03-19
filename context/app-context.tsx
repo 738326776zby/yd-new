@@ -13,6 +13,8 @@ import type { ICurrentWorkspace, LangGeniusVersionResponse, UserProfileResponse 
 import MaintenanceNotice from '@/app/components/header/maintenance-notice'
 import type { SystemFeatures } from '@/types/feature'
 import { defaultSystemFeatures } from '@/types/feature'
+import { fetchUserInfo } from '@/service/evaluation'
+import { UserInfo } from '@/models/evaluation'
 
 export type AppContextValue = {
   theme: Theme
@@ -32,6 +34,7 @@ export type AppContextValue = {
   langeniusVersionInfo: LangGeniusVersionResponse
   useSelector: typeof useSelector
   isLoadingCurrentWorkspace: boolean
+  userInfo: UserInfo
 }
 
 const initialLangeniusVersionInfo = {
@@ -61,6 +64,14 @@ const AppContext = createContext<AppContextValue>({
   setTheme: () => { },
   apps: [],
   mutateApps: () => { },
+  userInfo: {
+    email: '',
+    is_admin: false,
+    is_editor: false,
+    tenant_id: '',
+    user_id: '',
+    user_name: '',
+  },
   userProfile: {
     id: '',
     name: '',
@@ -91,7 +102,7 @@ export type AppContextProviderProps = {
 
 export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) => {
   const pageContainerRef = useRef<HTMLDivElement>(null)
-
+  const [userInfo, setUserInfo] = useState<UserInfo>({})
   const { data: appList, mutate: mutateApps } = useSWR({ url: '/apps', params: { page: 1, limit: 30, name: '' } }, fetchAppList)
   const { data: userProfileResponse, mutate: mutateUserProfile } = useSWR({ url: '/account/profile', params: {} }, fetchUserProfile)
   const { data: currentWorkspaceResponse, mutate: mutateCurrentWorkspace, isLoading: isLoadingCurrentWorkspace } = useSWR({ url: '/workspaces/current', params: {} }, fetchCurrentWorkspace)
@@ -122,7 +133,13 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
   useEffect(() => {
     updateUserProfileAndVersion()
   }, [updateUserProfileAndVersion, userProfileResponse])
-
+  const getUserInfo = async () => {
+    const res = await fetchUserInfo()
+    setUserInfo(res)
+  }
+  useEffect(() => {
+    getUserInfo()
+  }, [])
   useEffect(() => {
     if (currentWorkspaceResponse)
       setCurrentWorkspace(currentWorkspaceResponse)
@@ -144,6 +161,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
 
   return (
     <AppContext.Provider value={{
+      userInfo,
       theme,
       setTheme: handleSetTheme,
       apps: appList.data,

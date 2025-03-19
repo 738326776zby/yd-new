@@ -2,7 +2,7 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-19 10:55:45
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-19 12:08:51
+ * @LastEditTime: 2025-03-19 15:48:23
  * @FilePath: /yd-new/app/components/header/nav-new/nav-selector/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -20,12 +20,10 @@ import { debounce } from 'lodash-es'
 import cn from '@/utils/classnames'
 import AppIcon from '@/app/components/base/app-icon'
 import { AiText, ChatBot, CuteRobot } from '@/app/components/base/icons/src/vender/solid/communication'
-import { Route } from '@/app/components/base/icons/src/vender/solid/mapsAndTravel'
-import { useAppContext } from '@/context/app-context'
-import { useStore as useAppStore } from '@/app/components/app/store'
 import { FileArrow01, FilePlus01, FilePlus02 } from '@/app/components/base/icons/src/vender/line/files'
 import type { AppIconType } from '@/types/app'
 import { useSearchParams } from 'next/navigation'
+import { EvaluationRecord } from '@/models/evaluation'
 
 export type NavItem = {
   id: string
@@ -38,18 +36,14 @@ export type NavItem = {
   mode?: string
 }
 export type INavSelectorProps = {
-  navs: NavItem[]
+  navs: EvaluationRecord[]
+  curNav: EvaluationRecord | null
+  setCurNav: (nav: EvaluationRecord) => void
 }
 
-const NavSelector = ({  navs }: INavSelectorProps) => {
-  const { t } = useTranslation()
+const NavSelector = ({  navs,curNav,setCurNav }: INavSelectorProps) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const setAppDetail = useAppStore(state => state.setAppDetail)
-  const tenant_id = searchParams.get('tenant_id')
-  const user_id = searchParams.get('user_id')
-  const collections_id = searchParams.get('collections_id')
-  const curNav = navs.filter(navItem=>navItem.id===collections_id)[0]
+ 
   return (
     <div className="">
       <Menu as="div" className="relative inline-block text-left">
@@ -77,6 +71,8 @@ const NavSelector = ({  navs }: INavSelectorProps) => {
                   navs.map(nav => (
                     <Menu.Item key={nav.id}>
                       <div className='flex items-center w-full px-3 py-[6px] text-gray-700 text-[14px] rounded-lg font-normal hover:bg-gray-100 cursor-pointer truncate' onClick={() => {
+                        setCurNav(nav)
+                        router.push(`/evaluation/manage/${nav.id}`)
                       }} title={nav.name}>
                         <div className='truncate'>
                           {nav.name}

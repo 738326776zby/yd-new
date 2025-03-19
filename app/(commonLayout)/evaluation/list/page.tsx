@@ -23,6 +23,7 @@ export const sourceMap: { [key: number]: string } = {
   0: '本地上传',
   1: '平台预置'
 }
+
 const DefaultToolsList = () => {
   const { userInfo } = useContext(EvaluationContext)
   const [chooseTarget, setChooseTarget] = useState<EvaluationRecord | undefined>()
@@ -171,7 +172,7 @@ const DefaultToolsList = () => {
             <div
               onClick={(e) => {
                 e.preventDefault()
-                router.push(`/evaluation/manage?collections_id=${collection.id}&tenant_id=${collection.tenant_id}&user_id=${userInfo?.user_id}`)
+                router.push(`/evaluation/manage/${collection.id}`)
               }}
               onMouseEnter={() => {
                 setChooseTarget(collection)
@@ -179,6 +180,7 @@ const DefaultToolsList = () => {
               onMouseLeave={() => {
                 setChooseTarget(undefined)
               }}
+              key={collection.id}
               className='relative h-[160px] group col-span-1 bg-components-card-bg border-[1px] border-solid border-components-card-border rounded-xl shadow-sm inline-flex flex-col transition-all duration-200 ease-in-out cursor-pointer hover:shadow-lg flex'
             >
               <div className='flex pt-[14px] px-[14px] pb-3 h-[66px] items-center gap-3 grow-0 shrink-0'>
