@@ -64,7 +64,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const formSchemas = currTool
     ? toolParametersToFormSchemas(currTool.parameters)
     : [];
-  const infoSchemas = formSchemas.filter((item: any) => item.form === "llm");
+  const infoSchemas = [...formSchemas];
   const settingSchemas = formSchemas.filter((item: any) => item.form !== "llm");
   const hasSetting = settingSchemas.length > 0;
   const [tempSetting, setTempSetting] = useState(setting);
@@ -145,7 +145,7 @@ const SettingBuiltInTool: FC<Props> = ({
     setOutput(JSON.stringify(res))
   };
   const getFormItem = (item: any) => {
-    const { _type:type } = item
+    const { _type: type } = item
     if (type === "number") {
       return <Input
         className="resize-none mt-4"

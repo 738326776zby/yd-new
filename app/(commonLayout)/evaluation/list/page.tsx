@@ -171,7 +171,7 @@ const DefaultToolsList = () => {
             <div
               onClick={(e) => {
                 e.preventDefault()
-                router.push(`/evaluation/manage?collections_id=${collection.id}&tenant_id=${collection.tenant_id}`)
+                router.push(`/evaluation/manage?collections_id=${collection.id}&tenant_id=${collection.tenant_id}&user_id=${userInfo?.user_id}`)
               }}
               onMouseEnter={() => {
                 setChooseTarget(collection)

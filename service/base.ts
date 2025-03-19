@@ -313,8 +313,6 @@ const baseFetch = <T>(
     silent
   }: IOtherOptions,
 ): Promise<T> => {
-  console.log(fetchOptions)
-
   const options: typeof baseOptions & FetchOptionType = Object.assign({}, baseOptions, fetchOptions)
   if (getAbortController) {
     const abortController = new AbortController()
