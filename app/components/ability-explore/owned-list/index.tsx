@@ -4,7 +4,7 @@ import { RiCloseLine } from "@remixicon/react";
 import cn from "@/utils/classnames";
 import Input from "@/app/components/base/input";
 import Card from "./card";
-import Empty from "./empty";
+import Empty from "@/app/components/ability-explore/empty/empty";
 import { fetchHyydDataProvidersList } from "@/service/ability-explore";
 import ExploreContext from "@/context/ability-explore-context";
 import { useContext } from "use-context-selector";

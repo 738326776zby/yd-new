@@ -4,7 +4,7 @@ import { useRouter,useSearchParams } from 'next/navigation'
 import cn from '@/utils/classnames'
 import TabSliderNew from '@/app/components/base/tab-slider-new'
 import Input from '@/app/components/base/input'
-import Empty from '@/app/components/tools/add-tool-modal/empty'
+import Empty from "@/app/components/ability-explore/empty/empty";
 import { fetchInstallAppList } from '@/service/ability-explore'
 import { useContext } from 'use-context-selector'
 import ExploreContext from '@/context/ability-explore-context'

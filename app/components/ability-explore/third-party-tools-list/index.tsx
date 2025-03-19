@@ -10,7 +10,7 @@ import LabelFilter from '@/app/components/tools/labels/filter'
 import Input from '@/app/components/base/input'
 import ProviderCard from '@/app/components/tools/provider/card'
 import ProviderDetail from '@/app/components/tools/provider/detail'
-import Empty from '@/app/components/tools/add-tool-modal/empty'
+import Empty from "@/app/components/ability-explore/empty/empty";
 import ExploreContext from '@/context/ability-explore-context'
 import { useContext } from 'use-context-selector'
 import s from '../style.module.css'

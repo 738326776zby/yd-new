@@ -11,7 +11,7 @@ import {
   addDefaultValue,
   toolParametersToFormSchemas,
 } from "@/app/components/tools/utils/to-form-schema";
-import { Input, Select } from 'antd'
+import { Input, Select } from "antd";
 // import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
@@ -19,9 +19,12 @@ import {
   fetchCustomToolList,
   fetchModelToolList,
   fetchWorkflowToolList,
-  fetchBuiltInToolList
+  fetchBuiltInToolList,
 } from "@/service/tools";
-import { fetchTestTool, fetcHhyydToolsProviderList } from '@/service/ability-explore'
+import {
+  fetchTestTool,
+  fetcHhyydToolsProviderList,
+} from "@/service/ability-explore";
 import I18n from "@/context/i18n";
 import Button from "@/app/components/base/button";
 import Loading from "@/app/components/base/loading";
@@ -29,9 +32,7 @@ import { DiagonalDividingLine } from "@/app/components/base/icons/src/public/com
 import { getLanguage } from "@/i18n/language";
 import AppIcon from "@/app/components/base/app-icon";
 // import Select from "@/app/components/base/select";
-import {
-  useSearchParams,
-} from 'next/navigation'
+import { useSearchParams } from "next/navigation";
 import Toast from "@/app/components/base/toast";
 type Props = {
   collection: Collection;
@@ -57,7 +58,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const { locale } = useContext(I18n);
   const language = getLanguage(locale);
   const { t } = useTranslation();
-  const [output, setOutput] = useState('')
+  const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState<Tool[]>([]);
   const currTool = tools.find((tool) => tool.name === toolName);
@@ -71,8 +72,8 @@ const SettingBuiltInTool: FC<Props> = ({
   const [currType, setCurrType] = useState("info");
   const isInfoActive = currType === "info";
   const [paramsData, setParamsData] = useState<any>({});
-  const searchParams = useSearchParams()
-  const type = searchParams.get('type')
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
   useEffect(() => {
     if (!collection) return;
 
@@ -85,11 +86,10 @@ const SettingBuiltInTool: FC<Props> = ({
             else if (isBuiltIn)
               if (type === "defaultTools") {
                 resolve(await fetcHhyydToolsProviderList(collection.name));
-              } else if (type === 'owned') {
+              } else if (type === "owned") {
               } else {
-                resolve(await fetchBuiltInToolList(collection.name))
+                resolve(await fetchBuiltInToolList(collection.name));
               }
-
             else if (collection.type === CollectionType.workflow)
               resolve(await fetchWorkflowToolList(collection.id));
             else resolve(await fetchCustomToolList(collection.name));
@@ -100,7 +100,6 @@ const SettingBuiltInTool: FC<Props> = ({
         if (currTool) {
           const formSchemas = toolParametersToFormSchemas(currTool.parameters);
           setTempSetting(addDefaultValue(setting, formSchemas));
-
         }
       } catch (e) { }
       setIsLoading(false);
@@ -120,104 +119,118 @@ const SettingBuiltInTool: FC<Props> = ({
   })();
 
   const startTest = async () => {
-    const errorList: string[] = []
-    infoSchemas.forEach(infoItem => {
-      if (infoItem.required && (paramsData[infoItem['name']] === '' || paramsData[infoItem['name']] === undefined)) {
-        errorList.push(infoItem.label[language])
+    const errorList: string[] = [];
+    infoSchemas.forEach((infoItem) => {
+      if (
+        infoItem.required &&
+        (paramsData[infoItem["name"]] === "" ||
+          paramsData[infoItem["name"]] === undefined)
+      ) {
+        errorList.push(infoItem.label[language]);
       }
-    })
+    });
     if (errorList.length) {
       Toast.notify({
-        type: 'error',
+        type: "error",
         message: `${errorList.join(";")} 字段为必填项`,
-      })
-      return
+      });
+      return;
     }
     const res = await fetchTestTool({
-      tool: currTool?.name || '',
+      tool: currTool?.name || "",
       params: paramsData,
-      collection: collection.name
-    })
+      collection: collection.name,
+    });
     Toast.notify({
-      type: 'success',
-      message: '验证已完成，请查看下方输出',
-    })
-    setOutput(JSON.stringify(res))
+      type: "success",
+      message: "验证已完成，请查看下方输出",
+    });
+    setOutput(res);
   };
   const getFormItem = (item: any) => {
-    const { _type: type } = item
+    const { _type: type } = item;
     if (type === "number") {
-      return <Input
-        className="resize-none mt-4"
-        value={paramsData[item.name]}
-        placeholder="请输入"
-        variant="filled"
-        type="number"
-        onChange={(e) => {
-          setParamsData({
-            ...paramsData,
-            [item.name]: e.target.value,
-          });
-        }}
-      />
-    } else if (type === 'boolean') {
-      return <Select
-        className="resize-none mt-4 w-full"
-        value={paramsData[item.name]}
-        options={[
-          {
-            //@ts-ignore
-            value: true,
-            label: "是",
-          },
-          {
-            //@ts-ignore
-            value: false,
-            label: "否",
-          },
-        ]}
-        variant="filled"
-        onChange={(value) => {
-          setParamsData({
-            ...paramsData,
-            [item.name]: value,
-          });
-        }}
-      />
-    } else if (type === 'select') {
-      return <Select
-        className="resize-none mt-4 w-full"
-        variant="filled"
-        value={paramsData[item.name]}
-        onChange={(e) => {
-          setParamsData({
-            ...paramsData,
-            [item.name]: e,
-          });
-        }}
-        options={(item.options || []).map((i: any) => ({ label: i.value, value: i.value }))}
-      />
+      return (
+        <Input
+          className="resize-none mt-4"
+          value={paramsData[item.name]}
+          placeholder="请输入"
+          variant="filled"
+          type="number"
+          onChange={(e) => {
+            setParamsData({
+              ...paramsData,
+              [item.name]: e.target.value,
+            });
+          }}
+        />
+      );
+    } else if (type === "boolean") {
+      return (
+        <Select
+          className="resize-none mt-4 w-full"
+          value={paramsData[item.name]}
+          options={[
+            {
+              //@ts-ignore
+              value: true,
+              label: "是",
+            },
+            {
+              //@ts-ignore
+              value: false,
+              label: "否",
+            },
+          ]}
+          variant="filled"
+          onChange={(value) => {
+            setParamsData({
+              ...paramsData,
+              [item.name]: value,
+            });
+          }}
+        />
+      );
+    } else if (type === "select") {
+      return (
+        <Select
+          className="resize-none mt-4 w-full"
+          variant="filled"
+          value={paramsData[item.name]}
+          onChange={(e) => {
+            setParamsData({
+              ...paramsData,
+              [item.name]: e,
+            });
+          }}
+          options={(item.options || []).map((i: any) => ({
+            label: i.value,
+            value: i.value,
+          }))}
+        />
+      );
     } else {
       //@ts-ignore
-      return <TextArea
-        className=" resize-none mt-4"
-        autoSize
-        variant="filled"
-        value={paramsData[item.name]}
-        onChange={(e) => {
-          setParamsData({
-            ...paramsData,
-            [item.name]: e.target.value,
-          });
-        }}
-        placeholder="请输入"
-      />
+      return (
+        <TextArea
+          className=" resize-none mt-4"
+          autoSize
+          variant="filled"
+          value={paramsData[item.name]}
+          onChange={(e) => {
+            setParamsData({
+              ...paramsData,
+              [item.name]: e.target.value,
+            });
+          }}
+          placeholder="请输入"
+        />
+      );
     }
-  }
+  };
   const infoUI = (
     <div className="pt-2">
       <div className="text-[14px]  text-[#495464] font-bold  mb-[7px]">
-
         {t("tools.setBuiltInTools.toolDescription")}
       </div>
       <div className="mt-1 leading-[18px] text-xs font-normal text-[#495464]">
@@ -237,7 +250,7 @@ const SettingBuiltInTool: FC<Props> = ({
                   className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]"
                   onClick={() => {
                     setParamsData(exampleItem);
-                    setOutput('')
+                    setOutput("");
                   }}
                 >
                   示例{index + 1}
@@ -269,7 +282,6 @@ const SettingBuiltInTool: FC<Props> = ({
                   </div>
                 )}
                 {getFormItem(item)}
-
               </div>
             ))}
           </div>
@@ -284,19 +296,12 @@ const SettingBuiltInTool: FC<Props> = ({
           </div>
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
           <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
-            {/* {(() => {
-              try {
-                JSON.parse(output);
-                if (output?.data) {
-                  return <pre className="whitespace-pre-wrap break-words text-sm text-gray-600 font-mono">
-                    JSON.stringify(JSON.parse(output.data), null, 2)
-                  </pre>
-                }
-              } catch (e) {
-                return output;
-              }
-            })()} */}
+            <pre className="whitespace-pre-wrap break-words text-s">
 
+              {(typeof output === "object") && !!output.data
+                ? JSON.stringify(output.data, null, 2)
+                : output}
+            </pre>
           </div>
         </div>
       )}
