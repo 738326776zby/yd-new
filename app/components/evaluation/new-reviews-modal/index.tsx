@@ -146,7 +146,7 @@ const NewReviewsModal = ({
   };
   return (
     <Modal
-      title={`${details?.id ? "编辑" : "新建"}评测方案`}
+      title="新建评测"
       width={640}
       onCancel={closeModal}
       footer={
