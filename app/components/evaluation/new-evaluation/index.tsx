@@ -136,7 +136,7 @@ const NewEvaluationPrincipleModal = ({
             type: 'success',
             message: `${target?.id ? '更新' : '创建'}评测方案成功`
           });
-          onCancel && onCancel();
+          closeModal()
         } else {
           throw new Error('请求失败');
         }

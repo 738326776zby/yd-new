@@ -204,7 +204,7 @@ const SettingBuiltInTool: FC<Props> = ({
             });
           }}
           options={(item.options || []).map((i: any) => ({
-            label: i.value,
+            label: i.label[language],
             value: i.value,
           }))}
         />
