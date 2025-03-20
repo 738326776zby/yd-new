@@ -17,6 +17,7 @@ import s from "@/app/components/ability-explore/style.module.css";
 import { useContext } from "use-context-selector";
 import ExploreContext from "@/context/ability-explore-context";
 import { fetchYdToolList } from "@/service/ability-explore";
+import Empty from "@/app/components/ability-explore/empty/empty";
 
 type ListProps = {
   className: string;
@@ -168,7 +169,7 @@ const List = ({ className }: ListProps) => {
             </div>
           );
         })}
-
+        {allData.every(item => !item.items.length) && !loading && activeTab!== "all" && <Empty title="相关工具研发中，将陆续推出，敬请期待。" className="mt-4"/>}
       </div>
       <div
         className={cn(

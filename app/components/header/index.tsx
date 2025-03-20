@@ -63,6 +63,7 @@ const Header = () => {
         {!isMobile && <>
           <Link href="/apps" className='flex items-center mr-4'>
             <LogoSite className='object-contain' />
+            <span className='text-text-primary title-2xl-semi-bold'>元典法律数据智能平台</span>
           </Link>
           {systemFeatures.license.status === LicenseStatus.NONE && <GithubStar />}
         </>}

@@ -132,7 +132,7 @@ const List = ({ className }: ListProps) => {
           ))}
           {!collectionList.length && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Empty />
+              <Empty title="相关应用研发中，将陆续推出，敬请期待。"/>
             </div>
           )}
         </div>
