@@ -395,7 +395,6 @@ const AppList = ({ params: { id: collections_id } }: AppListProps) => {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  console.log("m");
                   getTableList({
                     evaluation_object: e.target.value,
                   });
