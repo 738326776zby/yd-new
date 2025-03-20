@@ -5,19 +5,23 @@ import { PromptRole } from '@/models/debug'
 
 export let apiPrefix = ''
 export let publicApiPrefix = ''
+export let pubicEvaluationApiPrefix = ''
 
 // NEXT_PUBLIC_API_PREFIX=/console/api NEXT_PUBLIC_PUBLIC_API_PREFIX=/api npm run start
-if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX) {
+if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX&&process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX) {
   apiPrefix = process.env.NEXT_PUBLIC_API_PREFIX
   publicApiPrefix = process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX
+  pubicEvaluationApiPrefix = process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX
 }
 else if (
   globalThis.document?.body?.getAttribute('data-api-prefix')
   && globalThis.document?.body?.getAttribute('data-pubic-api-prefix')
+  && globalThis.document?.body?.getAttribute('data-public-evaluation-api-prefix')
 ) {
   // Not build can not get env from process.env.NEXT_PUBLIC_ in browser https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser
   apiPrefix = globalThis.document.body.getAttribute('data-api-prefix') as string
   publicApiPrefix = globalThis.document.body.getAttribute('data-pubic-api-prefix') as string
+  pubicEvaluationApiPrefix = globalThis.document.body.getAttribute('data-public-evaluation-api-prefix') as string
 }
 else {
   // const domainParts = globalThis.location?.host?.split('.');
@@ -25,10 +29,12 @@ else {
   // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
   apiPrefix = 'http://localhost:5001/console/api'
   publicApiPrefix = 'http://localhost:5001/api' // avoid browser private mode api cross origin
+  pubicEvaluationApiPrefix = 'http://localhost:5001/evaluation/api'
 }
 
 export const API_PREFIX: string = apiPrefix
 export const PUBLIC_API_PREFIX: string = publicApiPrefix
+export const PUBLIC_EVALUATION_API_PREFIX: string = pubicEvaluationApiPrefix
 
 const EDITION = process.env.NEXT_PUBLIC_EDITION || globalThis.document?.body?.getAttribute('data-public-edition') || 'SELF_HOSTED'
 export const IS_CE_EDITION = EDITION === 'SELF_HOSTED'

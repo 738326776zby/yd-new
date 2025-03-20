@@ -1,5 +1,5 @@
 import { refreshAccessTokenOrRelogin } from './refresh-token'
-import { API_PREFIX, IS_CE_EDITION, PUBLIC_API_PREFIX } from '@/config'
+import { API_PREFIX, IS_CE_EDITION, PUBLIC_API_PREFIX, PUBLIC_EVALUATION_API_PREFIX } from '@/config'
 import Toast from '@/app/components/base/toast'
 import type { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem } from '@/app/components/base/chat/chat/type'
 import type { VisionFile } from '@/types/app'
@@ -335,7 +335,7 @@ const baseFetch = <T>(
   //@ts-ignore
   if (fetchOptions?.type === 'evaluation') {
     //@ts-ignore
-    urlPrefix = process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX
+    urlPrefix = PUBLIC_EVALUATION_API_PREFIX
 
   }else{
     urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX
