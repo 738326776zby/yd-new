@@ -27,6 +27,7 @@ const NewEvaluationPrincipleModal = ({
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([])
   const [evaluationObjectList, setEvaluationObjectList] = useState<EvaluationObjectItem[]>([])
+  const [placeholder, setPlaceholder] = useState<string>('')
   const NameByUrl = (url: string) => {
     if (!url) return '';
     // 处理路径分隔符，兼容反斜杠和正斜杠
@@ -69,7 +70,9 @@ const NewEvaluationPrincipleModal = ({
     const values = Object.values(changedValues)[0];
     if (key === "evaluation_type") {
       setShowSelect(values == "规则评分" ? true : false);
+      setPlaceholder(values == "大模型评分" ? "请输入具体评分标准，以prompt方式" : "")
     }
+
   };
   const beforeUpload = (file: any) => {
     const isExcelOrCsv = file.type === 'application/vnd.ms-excel' ||
@@ -213,10 +216,10 @@ const NewEvaluationPrincipleModal = ({
           <Input disabled={target?.id} />
         </Form.Item>
         <Form.Item label="适用说明" name="instructions" rules={[{ required: true, message: '适用说明为必填项' }]}>
-          <Input.TextArea />
+          <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }}/>
         </Form.Item>
         <Form.Item label="评测方式简介" name="introduction">
-          <Input.TextArea />
+          <Input.TextArea  autoSize={{ minRows: 2, maxRows: 4 }}/>
         </Form.Item>
         <Form.Item label="评测方法" name="evaluation_type" rules={[{ required: true, message: '评测方法为必填项' }]}>
           <Radio.Group disabled={target?.id}>
@@ -235,7 +238,7 @@ const NewEvaluationPrincipleModal = ({
               disabled={target?.id}
             />
           ) : (
-            <Input.TextArea disabled={target?.id} />
+            <Input.TextArea disabled={target?.id} placeholder={placeholder} autoSize={{ minRows: 2, maxRows: 4 }} />
           )}
         </Form.Item>
       </Form>
