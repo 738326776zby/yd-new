@@ -58,8 +58,7 @@ const Page: FC<PageProps> = ({ id }) => {
         </div>
         <div className="flex flex-col gap-2">
           <div className="text-[14px] font-bold text-[#495464]">介绍</div>
-          <div className="text-[14px] text-[#495464]">
-            {introduce?.full_description}
+          <div className="text-[14px] text-[#495464]" dangerouslySetInnerHTML={{ __html: introduce?.full_description }}>
           </div>
         </div>
         <div className="flex flex-col gap-2">
