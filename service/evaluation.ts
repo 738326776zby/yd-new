@@ -95,4 +95,9 @@ export const fetchRestartStart = (id:string) => {
   })
 }
 
+export const fetchCheckUserState = (user_id:string,user_name:string) => { 
+  return get<BaseResponse<boolean>>(`/api/v1/evaluate/user/checkUserState?user_id=${user_id}&user_name=${user_name}`, {
+    type: "evaluation"
+   })
+}
 

@@ -2,23 +2,44 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-18 01:14:42
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-18 01:19:31
+ * @LastEditTime: 2025-03-20 12:42:51
  * @FilePath: /yd-new/app/components/evaluation/first-page/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from 'antd';
 import { QuestionCircleFilled } from '@ant-design/icons';
 import EvaluationPrincipleModal from '@/app/components/evaluation/evaluation-principle';
 import { useRouter } from 'next/navigation'
 import s from './app.module.css'
 import cn from '@/utils/classnames'
+import { fetchCheckUserState } from '@/service/evaluation'
+import { useAppContext } from '@/context/app-context';
+import Loading from '@/app/components/base/loading'
 const AppList = () => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>();
   const router = useRouter()
+  const { userInfo: { user_id, user_name } } = useAppContext()
+  const [loading, setLoading] = useState<boolean>(true)
+  const judgeRouter = async () => {
+    setLoading(true)
+    const res = await fetchCheckUserState(user_id, user_name)
+    if (res.code === 200) {
+      
+      if (!res.data) {
+        router.push('/evaluation/list')
+      } else { 
+        setLoading(false)
+      }
+    }
+  }
+  useEffect(() => {
+    judgeRouter()
+  }, [])
   return (
     <div className='relative flex justify-center overflow-y-auto bg-background-body shrink-0  grow items-center'>
-      <div className='width-[960px] flex flex-col '>
+      {
+        !!loading ? <Loading type='area' />: <div className='width-[960px] flex flex-col '>
         <div className='flex  justify-center'>
           <div className='font-bold text-2xl text-[#1D2939] leading-[33px] '>欢迎使用效果评测</div>
           <Button type="link" icon={<QuestionCircleFilled />} onClick={() => {
@@ -38,7 +59,7 @@ const AppList = () => {
             <span className='font-normal text-sm text-[#495464] w-60  text-center'>选择与评测集所对应的某个工作流或者智能体。</span>
           </div>
           <div className='flex flex-col flex-1 items-center'>
-          <div className={cn("w-[240px] h-[160px] bg-white", s.step2)}></div>
+            <div className={cn("w-[240px] h-[160px] bg-white", s.step2)}></div>
             <span className='font-bold text-lg text-[#495464] mt-4 mb-1'>第三步：查看评测结果</span>
             <span className='font-normal text-sm text-[#495464] w-60 text-center'>查看评测结果，并可下载详细评测报告。</span>
           </div>
@@ -51,6 +72,7 @@ const AppList = () => {
           </Button>
         </div>
       </div>
+      }
       <EvaluationPrincipleModal open={open} setOpen={() => {
         setOpen(!open)
       }} />
