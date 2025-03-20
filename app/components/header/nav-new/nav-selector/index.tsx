@@ -2,7 +2,7 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-19 10:55:45
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-19 15:48:23
+ * @LastEditTime: 2025-03-20 12:23:06
  * @FilePath: /yd-new/app/components/header/nav-new/nav-selector/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -74,6 +74,7 @@ const NavSelector = ({  navs,curNav,setCurNav }: INavSelectorProps) => {
                         setCurNav(nav)
                         router.push(`/evaluation/manage/${nav.id}`)
                       }} title={nav.name}>
+                         <div className='w-3.5 h-3.5 bg-[url("~@/app/components/evaluation/assets/card.png")] bg-cover bg-no-repeat bg-center mr-1'></div>
                         <div className='truncate'>
                           {nav.name}
                         </div>
