@@ -15,7 +15,7 @@ import { Input, Select } from "antd";
 // import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
-import { omit } from "lodash";
+import { cloneDeep } from "lodash";
 import { Upload } from "antd";
 import {
   fetchCustomToolList,
@@ -161,7 +161,9 @@ const SettingBuiltInTool: FC<Props> = ({
       return;
     }
     setLoading(true)
-    const _params = omit(paramsData,'file')
+
+    const _params = cloneDeep(paramsData)
+    delete _params.file
     const res = await fetchTestTool({
       tool: currTool?.name || "",
       params: {
