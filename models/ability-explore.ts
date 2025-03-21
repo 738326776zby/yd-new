@@ -196,6 +196,10 @@ export type FetchTestToolReq = {
   tool: string
   params: Record<string, string>
   collection: string
+  show_name?: string
+  _is_file?: boolean
+  _is_upload?: boolean
+  file_name?: string
 }
 export type FetchYdToolListReq = {
   scope?: string
@@ -245,6 +249,11 @@ export type ThirdPartyDataListReqItem = {
   name: string
 }
 
-
+export type HyydFileUploadReq = {
+  file_name: string
+  show_name: string
+  _is_upload: boolean
+  _is_file: boolean
+}
 
 

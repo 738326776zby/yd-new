@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useContext } from "use-context-selector";
 import cn from "@/utils/classnames";
 import Drawer from "@/app/components/base/drawer-plus";
-// import Input from '@/app/components/base/input'
+import { fetchHyydFileUpload } from "@/service/ability-explore";
 import Form from "@/app/components/header/account-setting/model-provider-page/model-modal/Form";
 import {
   addDefaultValue,
@@ -15,12 +15,14 @@ import { Input, Select } from "antd";
 // import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
+import { Upload } from "antd";
 import {
   fetchCustomToolList,
   fetchModelToolList,
   fetchWorkflowToolList,
   fetchBuiltInToolList,
 } from "@/service/tools";
+import "./index.css";
 import {
   fetchTestTool,
   fetcHhyydToolsProviderList,
@@ -34,6 +36,8 @@ import AppIcon from "@/app/components/base/app-icon";
 // import Select from "@/app/components/base/select";
 import { useSearchParams } from "next/navigation";
 import Toast from "@/app/components/base/toast";
+import { UploadOutlined } from "@ant-design/icons";
+import { HyydFileUploadReq } from "@/models/ability-explore";
 type Props = {
   collection: Collection;
   isBuiltIn?: boolean;
@@ -61,6 +65,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState<Tool[]>([]);
+  const [fileStore, setFileStore] = useState<HyydFileUploadReq | undefined>();
   const currTool = tools.find((tool) => tool.name === toolName);
   const formSchemas = currTool
     ? toolParametersToFormSchemas(currTool.parameters)
@@ -101,7 +106,7 @@ const SettingBuiltInTool: FC<Props> = ({
           const formSchemas = toolParametersToFormSchemas(currTool.parameters);
           setTempSetting(addDefaultValue(setting, formSchemas));
         }
-      } catch (e) { }
+      } catch (e) {}
       setIsLoading(false);
     })();
   }, [collection?.name, collection?.id, collection?.type]);
@@ -117,7 +122,18 @@ const SettingBuiltInTool: FC<Props> = ({
     });
     return valid;
   })();
-
+  const uploadHandleChange = async ({ file }: any) => {
+    const formData = new FormData();
+    formData.append("file", file.originFileObj);
+    const res = await fetchHyydFileUpload(formData);
+    if (res.code === 200) {
+      setParamsData({
+        ...paramsData,
+        file: res.data.show_name,
+      });
+      setFileStore(res.data);
+    }
+  };
   const startTest = async () => {
     const errorList: string[] = [];
     infoSchemas.forEach((infoItem) => {
@@ -138,7 +154,13 @@ const SettingBuiltInTool: FC<Props> = ({
     }
     const res = await fetchTestTool({
       tool: currTool?.name || "",
-      params: paramsData,
+      params: {
+        _is_file: !!fileStore?._is_file,
+        _is_upload: !!fileStore?._is_upload,
+        file_name: fileStore?.file_name,
+        show_name: fileStore?.show_name,
+        ...paramsData,
+      },
       collection: collection.name,
     });
     Toast.notify({
@@ -209,6 +231,18 @@ const SettingBuiltInTool: FC<Props> = ({
           }))}
         />
       );
+    } else if (type === "file") {
+      console.log(paramsData["file"]);
+      console.log(item);
+      return (
+        <Input
+          className="resize-none mt-4"
+          value={paramsData[item.name]}
+          disabled
+          placeholder="请输入"
+          variant="filled"
+        />
+      );
     } else {
       //@ts-ignore
       return (
@@ -228,6 +262,7 @@ const SettingBuiltInTool: FC<Props> = ({
       );
     }
   };
+  const hasFile = infoSchemas.some((item: any) => item._type === "file");
   const infoUI = (
     <div className="pt-2">
       <div className="text-[14px]  text-[#495464] font-bold  mb-[7px]">
@@ -251,12 +286,25 @@ const SettingBuiltInTool: FC<Props> = ({
                   onClick={() => {
                     setParamsData(exampleItem);
                     setOutput("");
+                    setFileStore(undefined);
                   }}
                 >
                   示例{index + 1}
                 </div>
               );
             })}
+            {hasFile && (
+              <Upload
+                onChange={uploadHandleChange}
+                maxCount={1}
+                className="hyyd-upload"
+              >
+                <div className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]">
+                  上传
+                  <UploadOutlined />
+                </div>
+              </Upload>
+            )}
           </div>
           <div className="space-y-4 ">
             {infoSchemas.map((item: any, index) => (
@@ -297,8 +345,7 @@ const SettingBuiltInTool: FC<Props> = ({
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
           <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
             <pre className="whitespace-pre-wrap break-words text-s">
-
-              {(typeof output === "object") && !!output.data
+              {typeof output === "object" && !!output.data
                 ? JSON.stringify(output.data, null, 2)
                 : output}
             </pre>

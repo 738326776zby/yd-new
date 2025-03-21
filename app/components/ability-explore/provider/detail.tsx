@@ -289,7 +289,7 @@ const ProviderDetail = ({ collection, onRefreshData, type }: Props) => {
       <div className="mt-2 min-h-[36px] text-gray-500 text-sm leading-[18px]">
         {collection.description[language]}
       </div>
-      <div className="flex gap-1 border-b-[0.5px] b/5order-black">
+      <div className="flex gap-1 border-b-[0.5px] b/5order-black mt-4">
         {collection.type === CollectionType.builtIn && needAuth && (
           <Button
             variant={isAuthed ? "secondary" : "primary"}
