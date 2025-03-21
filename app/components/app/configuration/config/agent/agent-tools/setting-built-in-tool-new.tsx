@@ -15,6 +15,7 @@ import { Input, Select } from "antd";
 // import TextArea from "@/app/components/base/TextArea";
 import type { Collection, Tool } from "@/app/components/tools/types";
 import { CollectionType } from "@/app/components/tools/types";
+import { omit } from "lodash";
 import { Upload } from "antd";
 import {
   fetchCustomToolList,
@@ -28,7 +29,8 @@ import {
   fetcHhyydToolsProviderList,
 } from "@/service/ability-explore";
 import I18n from "@/context/i18n";
-import Button from "@/app/components/base/button";
+// import Button from "@/app/components/base/button";
+import { Button } from "antd";
 import Loading from "@/app/components/base/loading";
 import { DiagonalDividingLine } from "@/app/components/base/icons/src/public/common";
 import { getLanguage } from "@/i18n/language";
@@ -81,6 +83,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const [paramsData, setParamsData] = useState<any>({});
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (!collection) return;
 
@@ -127,8 +130,10 @@ const SettingBuiltInTool: FC<Props> = ({
   const uploadHandleChange = async ({ file }: any) => {
     const formData = new FormData();
     setOutput(undefined);
+    setLoading(true)
     formData.append("file", file.originFileObj);
     const res = await fetchHyydFileUpload(formData);
+    setLoading(false)
     if (res.code === 200) {
       setParamsData({
         ...paramsData,
@@ -155,16 +160,20 @@ const SettingBuiltInTool: FC<Props> = ({
       });
       return;
     }
+    setLoading(true)
+    const _params = omit(paramsData,'file')
     const res = await fetchTestTool({
       tool: currTool?.name || "",
       params: {
+        ..._params,
         _is_file: !!fileStore?._is_file,
         _is_upload: !!fileStore?._is_upload,
         file_name: fileStore?.file_name,
-        ...paramsData,
+        show_name: fileStore?.show_name,
       },
       collection: collection.name,
     });
+    setLoading(false)
     Toast.notify({
       type: "success",
       message: "验证已完成，请查看下方输出",
@@ -307,6 +316,7 @@ const SettingBuiltInTool: FC<Props> = ({
             })}
             {hasFile && (
               <Upload
+                fileList={[]}
                 onChange={uploadHandleChange}
                 maxCount={1}
                 className="hyyd-upload"
@@ -348,8 +358,10 @@ const SettingBuiltInTool: FC<Props> = ({
           <div className="flex justify-center my-6">
             <Button
               className="w-[104px] h-[32px] rounded-[20px]"
-              variant="primary"
+              shape="round"
+              type="primary"
               onClick={startTest}
+              disabled={loading}
             >
               开始验证
             </Button>
@@ -493,7 +505,7 @@ const SettingBuiltInTool: FC<Props> = ({
                   </Button>
                   <Button
                     className="flex items-center h-8 !px-3 !text-[13px] font-medium"
-                    variant="primary"
+                    type="primary"
                     disabled={!isValid}
                     onClick={() =>
                       onSave?.(addDefaultValue(tempSetting, formSchemas))
