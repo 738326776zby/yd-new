@@ -33,11 +33,13 @@ import Loading from "@/app/components/base/loading";
 import { DiagonalDividingLine } from "@/app/components/base/icons/src/public/common";
 import { getLanguage } from "@/i18n/language";
 import AppIcon from "@/app/components/base/app-icon";
-// import Select from "@/app/components/base/select";
 import { useSearchParams } from "next/navigation";
 import Toast from "@/app/components/base/toast";
 import { UploadOutlined } from "@ant-design/icons";
 import { HyydFileUploadReq } from "@/models/ability-explore";
+import type { BaseResponse } from "@/models/evaluation";
+import { PaperClipOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Tooltip } from "antd";
 type Props = {
   collection: Collection;
   isBuiltIn?: boolean;
@@ -62,7 +64,7 @@ const SettingBuiltInTool: FC<Props> = ({
   const { locale } = useContext(I18n);
   const language = getLanguage(locale);
   const { t } = useTranslation();
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState<BaseResponse<any> | undefined>("");
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState<Tool[]>([]);
   const [fileStore, setFileStore] = useState<HyydFileUploadReq | undefined>();
@@ -124,6 +126,7 @@ const SettingBuiltInTool: FC<Props> = ({
   })();
   const uploadHandleChange = async ({ file }: any) => {
     const formData = new FormData();
+    setOutput(undefined);
     formData.append("file", file.originFileObj);
     const res = await fetchHyydFileUpload(formData);
     if (res.code === 200) {
@@ -158,7 +161,6 @@ const SettingBuiltInTool: FC<Props> = ({
         _is_file: !!fileStore?._is_file,
         _is_upload: !!fileStore?._is_upload,
         file_name: fileStore?.file_name,
-        show_name: fileStore?.show_name,
         ...paramsData,
       },
       collection: collection.name,
@@ -168,6 +170,18 @@ const SettingBuiltInTool: FC<Props> = ({
       message: "验证已完成，请查看下方输出",
     });
     setOutput(res);
+  };
+  const handleDownloadFile = (item: any) => {
+    const base64Data = item.fileBase64;
+    const blob = new Blob([Buffer.from(base64Data, "base64")]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = item.fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
   const getFormItem = (item: any) => {
     const { _type: type } = item;
@@ -232,8 +246,6 @@ const SettingBuiltInTool: FC<Props> = ({
         />
       );
     } else if (type === "file") {
-      console.log(paramsData["file"]);
-      console.log(item);
       return (
         <Input
           className="resize-none mt-4"
@@ -285,7 +297,7 @@ const SettingBuiltInTool: FC<Props> = ({
                   className="w-[80px] h-[24px] bg-[#DEE9FF] rounded-[12px] flex items-center justify-center cursor-pointer text-[14px] text-[#155EEF]"
                   onClick={() => {
                     setParamsData(exampleItem);
-                    setOutput("");
+                    setOutput(undefined);
                     setFileStore(undefined);
                   }}
                 >
@@ -343,13 +355,39 @@ const SettingBuiltInTool: FC<Props> = ({
             </Button>
           </div>
           <div className="text-[14px]  text-[#495464]   font-bold">输出</div>
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
-            <pre className="whitespace-pre-wrap break-words text-s">
-              {typeof output === "object" && !!output.data
-                ? JSON.stringify(output.data, null, 2)
-                : output}
-            </pre>
-          </div>
+          {output?.type !== "blob" ? (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200  mb-4">
+              {
+                <pre className="whitespace-pre-wrap break-words text-s">
+                  {typeof output === "object" && !!output?.data
+                    ? JSON.stringify(output?.data, null, 2)
+                    : output}
+                </pre>
+              }
+            </div>
+          ) : (
+            <div className="mt-4 rounded-lg border border-gray-200  mb-4 flex flex-col gap-1">
+              {output.data.map((item: any) => {
+                return (
+                  <div
+                    key={item.id}
+                    className="flex cursor-pointer text-[14px] items-start p-4"
+                  >
+                    <div className="flex items-start">
+                      <PaperClipOutlined className="text-[#155EEF] mr-2 text-[16px] mt-1 " />
+                      <div>{item.fileName}</div>
+                    </div>
+                    <Tooltip title="下载">
+                      <DownloadOutlined className="text-[#155EEF] text-[18px] font-bold" onClick={() => {
+                        handleDownloadFile(item);
+                      }}/>
+                    </Tooltip>
+                  
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

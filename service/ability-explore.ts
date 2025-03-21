@@ -37,7 +37,7 @@ export const fetchInstallAppList = (params:FetchInstallAppListReq) => {
 }
 export const fetchTestTool = (data:FetchTestToolReq) => {
   const { collection, tool, params } = data
-  return post<any>(`/hyyd/tools-test/${collection}/${tool}`, {
+  return post<BaseResponse<any>>(`/hyyd/tools-test/${collection}/${tool}`, {
     body: params
   })
 }
