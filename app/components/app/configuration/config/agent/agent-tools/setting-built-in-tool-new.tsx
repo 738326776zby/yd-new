@@ -135,10 +135,7 @@ const SettingBuiltInTool: FC<Props> = ({
     const res = await fetchHyydFileUpload(formData);
     setLoading(false)
     if (res.code === 200) {
-      setParamsData({
-        ...paramsData,
-        file: res.data.show_name,
-      });
+      setParamsData(res.data);
       setFileStore(res.data);
     }
   };
@@ -163,15 +160,13 @@ const SettingBuiltInTool: FC<Props> = ({
     setLoading(true)
 
     const _params = cloneDeep(paramsData)
-    delete _params.file
     const res = await fetchTestTool({
       tool: currTool?.name || "",
       params: {
         ..._params,
-        _is_file: !!fileStore?._is_file,
-        _is_upload: !!fileStore?._is_upload,
-        file_name: fileStore?.file_name,
-        show_name: fileStore?.show_name,
+        ...fileStore,
+        _is_file: !!_params?._is_file || !!fileStore?._is_file,
+        _is_upload: !!_params?._is_upload || !!fileStore?._is_upload,
       },
       collection: collection.name,
     });

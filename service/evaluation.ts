@@ -17,6 +17,7 @@ import {
   UserInfo,
   EvaluationObjectItem
 } from "@/models/evaluation";
+import { pubicEvaluationApiPrefix } from "@/config";
 export const getCollectionsSchemelist = (
   tenant_id: string,
   user_id: string
@@ -66,10 +67,10 @@ export const getEvaluationObjectList = () => {
 };
 
 export const downloadReviews = async (id: string, tenant_id: string) => {
-  window.open(`${process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX}/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`)
+  window.open(`${pubicEvaluationApiPrefix}/api/v1/evaluate/record/download?id=${id}&tenant_id=${tenant_id}`)
 };
 export const downloadCollections = async (id: string) => {
-  window.open(`${process.env.NEXT_PUBLIC_EVALUATION_API_PREFIX}/api/v1/evaluate/collections/download?id=${id}`)
+  window.open(`${pubicEvaluationApiPrefix}/api/v1/evaluate/collections/download?id=${id}`)
 };
 export const fetchUserInfo = () => {
   return get<UserInfo>("/hyyd/user/info");

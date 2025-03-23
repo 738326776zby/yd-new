@@ -254,6 +254,7 @@ export type HyydFileUploadReq = {
   show_name: string
   _is_upload: boolean
   _is_file: boolean
+  file: string
 }
 
 
