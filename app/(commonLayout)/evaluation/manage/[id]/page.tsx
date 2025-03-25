@@ -324,12 +324,15 @@ const AppList = ({ params: { id: collections_id } }: AppListProps) => {
         <div className="flex  pt-[14px] px-[14px] pb-4 border-b border-dashed border-[#E1E3E7] ">
           <div className="grow  py-[1px] flex-1">
             <div className="flex items-center text-sm leading-5 font-semibold text-gray-800 justify-between">
+              <Tooltip title={details?.name}>
               <div
-                className="truncate text-[#1D2939] text-[14px]"
+                className="truncate text-[#1D2939] text-[14px] max-w-[200px]"
                 title={details?.name}
               >
                 {details?.name}
               </div>
+              </Tooltip>
+             
               <Button
                 type="link"
                 icon={<DownloadOutlined />}

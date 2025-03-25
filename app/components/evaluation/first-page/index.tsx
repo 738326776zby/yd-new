@@ -2,7 +2,7 @@
  * @Author: zhangboya3 zhangboya3@xiaomi.com
  * @Date: 2025-03-18 01:14:42
  * @LastEditors: zhangboya3 zhangboya3@xiaomi.com
- * @LastEditTime: 2025-03-20 12:42:51
+ * @LastEditTime: 2025-03-25 17:17:33
  * @FilePath: /yd-new/app/components/evaluation/first-page/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -16,11 +16,14 @@ import cn from '@/utils/classnames'
 import { fetchCheckUserState } from '@/service/evaluation'
 import { useAppContext } from '@/context/app-context';
 import Loading from '@/app/components/base/loading'
+import { useSearchParams } from 'next/navigation'
 const AppList = () => {
   const [open, setOpen] = useState<boolean>();
   const router = useRouter()
   const { userInfo: { user_id, user_name } } = useAppContext()
   const [loading, setLoading] = useState<boolean>(true)
+  const searchParams = useSearchParams()
+  const isIntroduction = searchParams.get('type') === 'introduction'
   const judgeRouter = async () => {
     setLoading(true)
     const res = await fetchCheckUserState(user_id, user_name)
@@ -34,14 +37,19 @@ const AppList = () => {
     }
   }
   useEffect(() => {
-    judgeRouter()
+    if (!isIntroduction) {
+      judgeRouter()
+    } else {
+      setLoading(false)
+    }
+
   }, [])
   return (
     <div className='relative flex justify-center overflow-y-auto bg-background-body shrink-0  grow items-center'>
       {
         !!loading ? <Loading type='area' />: <div className='width-[960px] flex flex-col '>
         <div className='flex  justify-center'>
-          <div className='font-bold text-2xl text-[#1D2939] leading-[33px] '>欢迎使用效果评测</div>
+          <div className='font-bold text-2xl text-[#1D2939]'>欢迎使用效果评测</div>
           <Button type="link" icon={<QuestionCircleFilled />} onClick={() => {
             setOpen(true)
           }}>查看效果评测原理</Button>

@@ -117,7 +117,7 @@ const DefaultToolsList = () => {
   }, [userInfo]);
 
   return (
-    <div className="flex h-full relative  overflow-hidden bg-gray-100 shrink-0  grow">
+    <div className="flex h-full relative  overflow-hidden bg-gray-100   grow">
       <div className="relative flex flex-col overflow-y-auto bg-gray-100 grow">
         <div
           className={cn(
@@ -144,10 +144,10 @@ const DefaultToolsList = () => {
                 type="link"
                 icon={<QuestionCircleFilled />}
                 onClick={() => {
-                  setOpen(true);
+                  router.push("/evaluation/apps?type=introduction");
                 }}
               >
-                查看效果评测原理
+                效果评测介绍
               </Button>
             </div>
           </div>
