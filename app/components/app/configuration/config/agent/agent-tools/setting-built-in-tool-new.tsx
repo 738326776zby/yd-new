@@ -157,7 +157,7 @@ const SettingBuiltInTool: FC<Props> = ({
       });
       return;
     }
-    // setLoading(true)
+    setLoading(true)
 
     const _params = cloneDeep(paramsData)
     const res = await fetchTestTool({
@@ -200,6 +200,7 @@ const SettingBuiltInTool: FC<Props> = ({
           variant="filled"
           type="number"
           onChange={(e) => {
+            setLoading(false)
             setParamsData({
               ...paramsData,
               [item.name]: e.target.value,
@@ -230,6 +231,7 @@ const SettingBuiltInTool: FC<Props> = ({
               ...paramsData,
               [item.name]: value,
             });
+            setLoading(false)
           }}
         />
       );
@@ -244,6 +246,7 @@ const SettingBuiltInTool: FC<Props> = ({
               ...paramsData,
               [item.name]: e,
             });
+            setLoading(false)
           }}
           options={(item.options || []).map((i: any) => ({
             label: i.label[language],
@@ -274,6 +277,7 @@ const SettingBuiltInTool: FC<Props> = ({
               ...paramsData,
               [item.name]: e.target.value,
             });
+            setLoading(false)
           }}
           placeholder="请输入"
         />
