@@ -76,6 +76,7 @@ const AppList = ({ params: { id: collections_id } }: AppListProps) => {
       render: (a, b, i) => {
         return i + 1;
       },
+      width:80
     },
     {
       title: "评测对象",
@@ -89,6 +90,7 @@ const AppList = ({ params: { id: collections_id } }: AppListProps) => {
       title: "本次评测说明",
       dataIndex: "task_description",
       key: "task_description",
+      width: 300,
     },
     {
       title: "评测人",

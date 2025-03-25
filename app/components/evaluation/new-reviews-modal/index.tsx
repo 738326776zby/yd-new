@@ -67,7 +67,11 @@ const NewReviewsModal = ({
           },
         ]);
       }
-      form?.setFieldsValue(details);
+      form?.setFieldsValue({
+        ...details,
+        task_description: '',
+        evaluation_object: ''
+      });
     } else {
       setFileList([]);
     }

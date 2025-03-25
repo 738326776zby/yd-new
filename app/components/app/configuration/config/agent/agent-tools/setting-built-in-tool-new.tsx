@@ -157,7 +157,7 @@ const SettingBuiltInTool: FC<Props> = ({
       });
       return;
     }
-    setLoading(true)
+    // setLoading(true)
 
     const _params = cloneDeep(paramsData)
     const res = await fetchTestTool({
@@ -170,7 +170,7 @@ const SettingBuiltInTool: FC<Props> = ({
       },
       collection: collection.name,
     });
-    setLoading(false)
+    // setLoading(false)
     Toast.notify({
       type: "success",
       message: "验证已完成，请查看下方输出",
