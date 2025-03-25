@@ -25,6 +25,7 @@ import {
 import cn from "classnames";
 import "./index.css";
 import Toast from "@/app/components/base/toast";
+import { Tooltip } from "antd";
 export type AppListProps = {
   params: {
     id: string;
@@ -91,6 +92,14 @@ const AppList = ({ params: { id: collections_id } }: AppListProps) => {
       dataIndex: "task_description",
       key: "task_description",
       width: 300,
+      render: (text: string) => { 
+
+        return (
+          <Tooltip title={text}>
+            <span className="truncate block w-[300px]">{text}</span>
+          </Tooltip>
+        );
+      }
     },
     {
       title: "评测人",
