@@ -106,9 +106,7 @@ const WorkflowProcessItem = ({
         </div>
         {!readonly && <RiArrowRightSLine className={`'ml-1 w-4 h-4 text-text-tertiary' ${collapse ? '' : 'rotate-90'}`} />}
       </div>
-      {
-        !collapse && !readonly && (
-          <div className='mt-1.5'>
+      <div className='mt-1.5'>
             {
               <TracingPanel
                 list={data.tracing}
@@ -119,8 +117,6 @@ const WorkflowProcessItem = ({
               />
             }
           </div>
-        )
-      }
     </div>
   )
 }
